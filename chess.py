@@ -111,7 +111,7 @@ class Piece:
                         break
                 else:
                     break
-            for i in range(1, 8):
+            for i in range(1, 9):
                 if pos[0] - i >= 0 and pos[1] - i >= 0:
                     if board_arr[pos[0] - i][pos[1] - i] == None:
                         moves.append(Position(pos[0] - i, pos[1] - i))
