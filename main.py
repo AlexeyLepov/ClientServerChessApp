@@ -14,10 +14,6 @@ import subprocess
 import tkinter
 import customtkinter
 import tkinter.messagebox
-import chess
-import chess.pgn
-import chess.engine
-import chess.polyglot
 
 customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("blue")
