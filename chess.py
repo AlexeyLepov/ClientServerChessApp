@@ -34,7 +34,7 @@ class Piece:
         self.first_move = first_move
     
     def __str__(self):
-        return "White" if self.color == Color.WHITE else "Black" + " " + self.name
+        return ("White" if self.color == Color.WHITE else "Black") + " *" + self.name + "* "
     
     def __repr__(self):
         return f"Piece({self.color}, {self.name}, {self.value})"
@@ -43,79 +43,68 @@ class Piece:
         """
         Returns a list of all possible moves for a piece
         """
-        pos = [Position.row+1, Position.col+1]
+        pos = [self.position.row, self.position.col]
         moves = []
         if self.name == "pawn":
             if self.color == Color.WHITE:
-                if  pos[1] != 8 and board_arr[pos[0]][pos[1]+1] == None :
+                if pos[0] != 7 and board_arr[pos[0]+1][pos[1]] == None :
                     moves.append(Position(pos[0] + 1, pos[1]))
-                if self.first_move and board_arr[pos[0]][pos[1]+2] == None:
-                    moves.append(Position(pos[0], pos[1] + 2))
-            if self.color == Color.BlACK:
-                if pos[1] != 1 and board_arr[pos[0]][pos[1]-1] == None:
-                    moves.append(Position(pos[0], pos[1] - 1))
-                if self.first_move and board_arr[pos[0]][pos[1]-2] == None:
-                    moves.append(Position(pos[0], pos[1] - 2))
+                if pos[0] == 1 and board_arr[pos[0]+2][pos[1]] == None:
+                    moves.append(Position(pos[0] + 2, pos[1]))
+            if self.color == Color.BLACK:
+                if pos[0] != 0 and board_arr[pos[0]-1][pos[1]] == None:
+                    moves.append(Position(pos[0] - 1, pos[1]))
+                if pos[0] == 6 and board_arr[pos[0]-2][pos[1]] == None:
+                    moves.append(Position(pos[0] - 2, pos[1]))
                     
         elif self.name == "rook" or self.name == "queen":
-            for i in range(pos[0], 9):
+            for i in range(pos[0]+1, 8):
                 if board_arr[i][pos[1]] == None:
                     moves.append(Position(i, pos[1]))
                 else:
                     break
-            for i in range(pos[0], 0, -1):
+            for i in range(pos[0]-1, -1, -1):
                 if board_arr[i][pos[1]] == None:
                     moves.append(Position(i, pos[1]))
                 else:
                     break
-            for i in range(pos[1], 9):
+            for i in range(pos[1]+1, 8):
                 if board_arr[pos[0]][i] == None:
                     moves.append(Position(pos[0], i))
                 else:
                     break
-            for i in range(pos[1], 0, -1):
+            for i in range(pos[1]-1, -1, -1):
                 if board_arr[pos[0]][i] == None:
                     moves.append(Position(pos[0], i))
                 else:
                     break
                 
-        elif self.name == "knight":
-            if pos[0] + 2 <= 8 and pos[1] + 1 <= 8:
-                moves.append(Position(pos[0] + 2, pos[1] + 1))
-            if pos[0] + 2 <= 8 and pos[1] - 1 >= 1:
-                moves.append(Position(pos[0] + 2, pos[1] - 1))
-            if pos[0] - 2 >= 1 and pos[1] + 1 <= 8:
-                moves.append(Position(pos[0] - 2, pos[1] + 1))
-            if pos[0] - 2 >= 1 and pos[1] - 1 >= 1:
-                moves.append(Position(pos[0] - 2, pos[1] - 1))
-            if pos[0] + 1 <= 8 and pos[1] + 2 <= 8:
-                moves.append(Position(pos[0] + 1, pos[1] + 2))
-            if pos[0] + 1 <= 8 and pos[1] - 2 >= 1:
-                moves.append(Position(pos[0] + 1, pos[1] - 2))
-            if pos[0] - 1 >= 1 and pos[1] + 2 <= 8:
-                moves.append(Position(pos[0] - 1, pos[1] + 2))
-            if pos[0] - 1 >= 1 and pos[1] - 2 >= 1:
-                moves.append(Position(pos[0] - 1, pos[1] - 2))
+        elif self.name == "knight": 
+            for i in range(-2, 3):
+                for j in range(-2, 3):
+                    if abs(i) + abs(j) == 3:
+                        if 0 <= pos[0] + i < 8 and 0 <= pos[1] + j < 8 and (board_arr[pos[0] + i][pos[1] + j] == None):
+                            moves.append(Position(pos[0] + i, pos[1] + j))
                 
         elif self.name == "bishop" or self.name == "queen":
-            for i in range(1, 9):
-                if pos[0] + i <= 8 and pos[1] + i <= 8:
+            for i in range(1, 8):
+                if pos[0] + i <= 7 and pos[1] + i <= 7:
                     if board_arr[pos[0] + i][pos[1] + i] == None:
                         moves.append(Position(pos[0] + i, pos[1] + i))
                     else:
                         break
                 else:
                     break
-            for i in range(1, 9):
-                if pos[0] + i <= 8 and pos[1] - i >= 1:
+            for i in range(1, 8):
+                if pos[0] + i <= 7 and pos[1] - i >= 0:
                     if board_arr[pos[0] + i][pos[1] - i] == None:
                         moves.append(Position(pos[0] + i, pos[1] - i))
                     else:
                         break
                 else:
                     break
-            for i in range(1, 9):
-                if pos[0] - i >= 1 and pos[1] + i <= 8:
+            for i in range(1, 8):
+                if pos[0] - i >= 0 and pos[1] + i <= 7:
                     if board_arr[pos[0] - i][pos[1] + i] == None:
                         moves.append(Position(pos[0] - i, pos[1] + i))
                     else:
@@ -123,7 +112,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                if pos[0] - i >= 1 and pos[1] - i >= 1:
+                if pos[0] - i >= 0 and pos[1] - i >= 0:
                     if board_arr[pos[0] - i][pos[1] - i] == None:
                         moves.append(Position(pos[0] - i, pos[1] - i))
                     else:
@@ -131,27 +120,29 @@ class Piece:
                 else:
                     break
         if self.name == "king":
-            if pos[0] + 1 <= 8:
+            if pos[0] + 1 <= 7:
                 moves.append(Position(pos[0] + 1, pos[1]))
-            if pos[0] - 1 >= 1:
+            if pos[0] - 1 >= 0:
                 moves.append(Position(pos[0] - 1, pos[1]))
-            if pos[1] + 1 <= 8:
+            if pos[1] + 1 <= 7:
                 moves.append(Position(pos[0], pos[1] + 1))
-            if pos[1] - 1 >= 1:
+            if pos[1] - 1 >= 0:
                 moves.append(Position(pos[0], pos[1] - 1))
-            if pos[0] + 1 <= 8 and pos[1] + 1 <= 8:
+            if pos[0] + 1 <= 7 and pos[1] + 1 <= 7:
                 moves.append(Position(pos[0] + 1, pos[1] + 1))
-            if pos[0] + 1 <= 8 and pos[1] - 1 >= 1:
+            if pos[0] + 1 <= 7 and pos[1] - 1 >= 0:
                 moves.append(Position(pos[0] + 1, pos[1] - 1))
-            if pos[0] - 1 >= 1 and pos[1] + 1 <= 8:
+            if pos[0] - 1 >= 0 and pos[1] + 1 <= 7:
                 moves.append(Position(pos[0] - 1, pos[1] + 1))
-            if pos[0] - 1 >= 1 and pos[1] - 1 >= 1:
+            if pos[0] - 1 >= 0 and pos[1] - 1 >= 0:
                 moves.append(Position(pos[0] - 1, pos[1] - 1))
         
-        for move in moves:
-            move.col -= 1
-            move.row -= 1
-            
+        #for move in moves:
+        #    move.col -= 1
+        #    move.row -= 1
+        
+        return moves
+    
     def correct_captures(self, board_arr, prev_board_arr):
         """
         Returns a list of all possible captures for a piece
@@ -209,7 +200,7 @@ class Piece:
         
 class Board:
     def __init__(self, pieces = None):
-        if pieces is None and arr is None:
+        if pieces is None:
             self.pieces = Board.new_board()
         else:
             self.pieces = pieces
@@ -253,7 +244,7 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if arr[i][j] != "":
-                    pieces.append(Piece(FEN_pieces[arr[i][j]][1], FEN_pieces[arr[i][j]][0], Piece.get_value(FEN_pieces[arr[i][j]][0]), Position(i, j)))
+                    pieces.append(Piece(FEN_pieces[arr[i][j]][1], FEN_pieces[arr[i][j]][0], Piece.get_value(FEN_pieces[arr[i][j]][0]), Position(7-i, j)))
         
         return cls(pieces)
     def move_piece(self, piece,  new_pos):
@@ -277,9 +268,9 @@ class Board:
         """
         Returns a text 2d array of the board
         """
-        arr = [["##" if (i+j)%2 == 1 else "  " for i in range(8)] for j in range(8)]
+        arr = [["  " if (i+j)%2 == 1 else "  " for i in range(8)] for j in range(8)]
         for piece in self.pieces:
-            arr[piece.position.row][piece.position.col] = {Color.BLACK: "B", Color.WHITE: "W"}[piece.color] + {"pawn": "P", "rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K"}[piece.name]
+            arr[7-piece.position.row][piece.position.col] = {Color.BLACK: "B", Color.WHITE: "W"}[piece.color] + {"pawn": "P", "rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K"}[piece.name]
         return arr
     
     def __str__(self):
@@ -287,8 +278,20 @@ class Board:
         return "\n".join([" ".join(i) for i in arr][::-1])
         
 def main():
-    board = Board.from_FEN("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R")
-    for i in board.get_piece_arr():
-        print(i)
+    board = Board.from_FEN("8/4B3/6N1/8/1B6/3n4/8/8 w KQkq ")
+    arr = board.get_str_arr()
+    for i in arr:
+        print(*i)
+    for piece in board.pieces: 
+        arr_ = copy.deepcopy(arr)
+        moves = Piece.correct_moves(piece, board.arr, board.prev_arr)
+        print(piece)
+        for move in moves:
+            arr_[7-move.row][move.col] = "XX"
+        pos = piece.position
+        arr_[7-pos.row][pos.col] = "OO"
+        for i in arr_:
+            print(*i) 
+        
 if __name__ == "__main__": 
     main()
