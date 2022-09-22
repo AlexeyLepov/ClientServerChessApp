@@ -18,6 +18,14 @@ import tkinter.messagebox
 customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("blue")
 
+# =============================================================================================================
+# ============================================== Параметры доски ==============================================
+# =============================================================================================================
+WIDTH = HEIGHT = 512  # width and height of the chess board
+DIMENSION = 8  # the dimensions of the chess board
+SQ_SIZE = HEIGHT // DIMENSION  # the size of each of the squares in the board
+IMAGES = {}  # images for the chess pieces
+
 class App(customtkinter.CTk):
     WIDTH = 1000 # Задание ширины окна приложения
     HEIGHT = 600 # Задание высоты окна приложения
