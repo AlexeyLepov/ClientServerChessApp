@@ -27,16 +27,14 @@ import chessEngine
 customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("blue")
 
-
-##########################
-#                        #
-#    Параметры доски     #
-#                        #
-##########################
-pygame.init()
+###################################
+#                                 #
+#    Параметры шахматной доски    #
+#                                 #
+###################################
 B_WIDTH = B_HEIGHT = 512        # width and height of the chess board
 DIMENSION = 8                   # the dimensions of the chess board
-SQ_SIZE = B_HEIGHT // DIMENSION  # the size of each of the squares in the board
+SQ_SIZE = B_HEIGHT // DIMENSION # the size of each of the squares in the board
 IMAGES = {}                     # images for the chess pieces
 MAX_FPS = 60                    # FPS for animations
 pieceDir = "Assets/Pieces/"     # Стандартная папка для изображений фигур
@@ -46,30 +44,44 @@ def loadImages():
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ',
               'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = pygame.transform.scale(pygame.image.load(
-            pieceDir + piece + ".png"), (SQ_SIZE, SQ_SIZE))
+        IMAGES[piece] = pygame.transform.scale(pygame.image.load(pieceDir + piece + ".png"), (SQ_SIZE, SQ_SIZE))
 
 
-def loadBoard(screen, chessboard):          # Загрузка шахматной доски
-    drawBoard(screen)                       # Рисование шахматной доски
-    drawPieces(screen, chessboard.board)    # Рисование шахматных фигур
+def loadBoard(screen, chessboard):
+    """Загрузка шахматной доски
+
+    Args:
+        screen (_type_): _description_
+        chessboard (_type_): _description_
+    """
+    drawBoard(screen)
+    drawPieces(screen, chessboard.board)
 
 
 def drawBoard(screen):
-    colors = [pygame.Color("white"), pygame.Color("gray")]
+    """Рисование шахматной доски
+
+    Args:
+        screen (_type_): _description_
+    """
+    colors = [pygame.Color("#edede9"), pygame.Color("#457b9d")]
     # for i in range(DIMENSION): for j in range(DIMENSION):
     for i, j in itertools.product(range(DIMENSION), range(DIMENSION)):
         color = colors[((i+j) % 2)]
-        pygame.draw.rect(screen, color, pygame.Rect(
-            j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        pygame.draw.rect(screen, color, pygame.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def drawPieces(screen, chessboard):
+    """Рисование шахматных фигур
+
+    Args:
+        screen (_type_): _description_
+        chessboard (_type_): _description_
+    """
     for i, j in itertools.product(range(DIMENSION), range(DIMENSION)):
         piece = chessboard[i][j]
         if piece != "--":
-            screen.blit(IMAGES[piece], pygame.Rect(
-                j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+            screen.blit(IMAGES[piece], pygame.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
  #####################################################
@@ -199,7 +211,6 @@ class App(customtkinter.CTk):
             self.button_info.configure(fg_color=("gray75", "#5c8da4"))
         else:
             self.button_info.configure(fg_color=("#7db8d4"))
-        print("Нажата кнопка вызова окна для выполнения функций для отображения информации о программе")
 
     def button_play_event(self):
         self.hide_menu_frames()
@@ -209,7 +220,6 @@ class App(customtkinter.CTk):
             self.button_play.configure(fg_color=("gray75", "#5c8da4"))
         else:
             self.button_play.configure(fg_color=("#7db8d4"))
-        print("Нажата кнопка вызова окна для выполнения функций для натуральных чисел")
 
     def change_mode(self):
         if self.switch_dark_theme.get() == 1:
@@ -231,11 +241,13 @@ class App(customtkinter.CTk):
 ##################################
 if __name__ == "__main__":
 
+    pygame.init()
     screen = pygame.display.set_mode((B_WIDTH, B_HEIGHT))
     clock = pygame.time.Clock()
     screen.fill(pygame.Color("white"))
     board = chessBoard.chessBoard()
     loadImages()
+    loadBoard(screen, board)
     # print(board.board) # debug
     running = True
     while running:
