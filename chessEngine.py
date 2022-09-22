@@ -1,3 +1,13 @@
+########################################################
+#                                                      #
+#    ##############################################    #
+#    #                                            #    #
+#    #    Класс для работы с шахматной логикой    #    #
+#    #                                            #    #
+#    ##############################################    #
+#                                                      #
+########################################################
+
 from enum import Enum
 import copy
 
@@ -323,7 +333,7 @@ class Board:
         """
         Returns a 2d array of the board
         """
-        arr = [[None for i in range(8)] for j in range(8)]
+        arr = [[None for _ in range(8)] for _ in range(8)]
         for piece in self.pieces:
             arr[piece.position.row][piece.position.col] = piece
         return arr
