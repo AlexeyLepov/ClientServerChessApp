@@ -134,7 +134,7 @@ class Piece:
                                 Position(self.position.row + i, self.position.col + j))
 
         elif self.name == "bishop" or self.name == "queen":
-            for i in range(1, 8):
+            for i in range(1, 9):
                 if self.position.row + i <= 7 and self.position.col + i <= 7:
                     if board_arr[self.position.row + i][self.position.col + i] == None:
                         moves.append(
@@ -143,7 +143,7 @@ class Piece:
                         break
                 else:
                     break
-            for i in range(1, 8):
+            for i in range(1, 9):
                 if self.position.row + i <= 7 and self.position.col - i >= 0:
                     if board_arr[self.position.row + i][self.position.col - i] == None:
                         moves.append(
@@ -152,7 +152,7 @@ class Piece:
                         break
                 else:
                     break
-            for i in range(1, 8):
+            for i in range(1, 9):
                 if self.position.row - i >= 0 and self.position.col + i <= 7:
                     if board_arr[self.position.row - i][self.position.col + i] == None:
                         moves.append(
@@ -171,30 +171,19 @@ class Piece:
                 else:
                     break
         if self.name == "king":
-            if self.position.row + 1 <= 7:
-                moves.append(
-                    Position(self.position.row + 1, self.position.col))
-            if self.position.row - 1 >= 0:
-                moves.append(
-                    Position(self.position.row - 1, self.position.col))
-            if self.position.col + 1 <= 7:
-                moves.append(
-                    Position(self.position.row, self.position.col + 1))
-            if self.position.col - 1 >= 0:
-                moves.append(
-                    Position(self.position.row, self.position.col - 1))
-            if self.position.row + 1 <= 7 and self.position.col + 1 <= 7:
-                moves.append(Position(self.position.row +
-                             1, self.position.col + 1))
-            if self.position.row + 1 <= 7 and self.position.col - 1 >= 0:
-                moves.append(Position(self.position.row +
-                             1, self.position.col - 1))
-            if self.position.row - 1 >= 0 and self.position.col + 1 <= 7:
-                moves.append(Position(self.position.row -
-                             1, self.position.col + 1))
-            if self.position.row - 1 >= 0 and self.position.col - 1 >= 0:
-                moves.append(Position(self.position.row -
-                             1, self.position.col - 1))
+            king_moves = []
+            for i in [-1,1]:
+                for j in [-1,1]: 
+                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] == None or board_arr[self.position.row + i][self.position.col + j].color != self.color):
+                        king_moves.append(Position(self.position.row + i, self.position.col + j))
+            
+            for p in board_arr:
+                if p != None and p.color != self.color and p.name != "king":
+                    for move in p.correct_moves(board_arr, prev_board_arr):
+                        if move in king_moves:
+                            moves.append(move)
+                    
+                    
 
         # for move in moves:
         #    move.col -= 1
@@ -203,16 +192,89 @@ class Piece:
         return moves
 
     def correct_captures(self, board_arr, prev_board_arr):
-        """Returns a list of all possible captures for a piece
-
-        Args:
-            board_arr (_type_): _description_
-            prev_board_arr (_type_): _description_
-
-        Raises:
-            NotImplementedError: _description_
-        """
-        raise NotImplementedError
+        captures = []
+        if self.name == "king":
+            king_captures = []
+            for i in [-1,1]:
+                for j in [-1,1]:
+                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] != None and board_arr[self.position.row + i][self.position.col + j].color != self.color):
+                        king_captures.append(
+                            Position(self.position.row + i, self.position.col + j))
+            for p in board_arr:
+                if p != None and p.color != self.color:
+                    for move in p.correct_moves(board_arr, prev_board_arr):
+                        if move in king_captures != "king":
+                            captures.append(move)
+        if self.name == "pawn": # pawn captures
+            if self.color == Color.WHITE:
+                if self.position.row != 7 and self.position.col != 0 and board_arr[self.position.row+1][self.position.col-1] != None and board_arr[self.position.row+1][self.position.col-1].color == Color.BLACK:
+                    captures.append(
+                        Position(self.position.row + 1, self.position.col - 1))
+                if self.position.row != 7 and self.position.col != 7 and board_arr[self.position.row+1][self.position.col+1] != None and board_arr[self.position.row+1][self.position.col+1].color == Color.BLACK:
+                    captures.append(
+                        Position(self.position.row + 1, self.position.col + 1))
+            if self.color == Color.BLACK:
+                if self.position.row != 0 and self.position.col != 0 and board_arr[self.position.row-1][self.position.col-1] != None and board_arr[self.position.row-1][self.position.col-1].color == Color.WHITE:
+                    captures.append(
+                        Position(self.position.row - 1, self.position.col - 1))
+                if self.position.row != 0 and self.position.col != 7 and board_arr[self.position.row-1][self.position.col+1] != None and board_arr[self.position.row-1][self.position.col+1].color == Color.WHITE:
+                    captures.append(
+                        Position(self.position.row - 1, self.position.col + 1))
+        if self.name == "knight":
+            for i in range(-2, 3):
+                for j in range(-2, 3):
+                    if abs(i) + abs(j) == 3:
+                        if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] is not None):
+                            captures.append(
+                                Position(self.position.row + i, self.position.col + j))
+        if self.name == "rook" or self.name == "queen":
+            for i in range(self.position.row+1, 8):
+                if board_arr[i][self.position.col] is not None:
+                    captures.append(Position(i, self.position.col))
+                    break
+            for i in range(self.position.row-1, -1, -1):
+                if board_arr[i][self.position.col] is not None:
+                    captures.append(Position(i, self.position.col))
+                    break
+            for i in range(self.position.col+1, 8):
+                if board_arr[self.position.row][i] is not None:
+                    captures.append(Position(self.position.row, i))
+                    break
+            for i in range(self.position.col-1, -1, -1):
+                if board_arr[self.position.row][i] is not None:
+                    captures.append(Position(self.position.row, i))
+                    break
+        if self.name == "bishop" or self.name == "queen":
+            for i in range(1, 9):
+                if self.position.row + i <= 7 and self.position.col + i <= 7:
+                    if board_arr[self.position.row + i][self.position.col + i] is not None:
+                        captures.append(Position(self.position.row + i, self.position.col + i))
+                        break
+                else:
+                    break
+            for i in range(1, 9):
+                if self.position.row + i <= 7 and self.position.col - i >= 0:
+                    if board_arr[self.position.row + i][self.position.col - i] is not None:
+                        captures.append(Position(self.position.row + i, self.position.col - i))
+                        break
+                else:
+                    break
+            for i in range(1, 9):
+                if self.position.row - i >= 0 and self.position.col + i <= 7:
+                    if board_arr[self.position.row - i][self.position.col + i] is not None:
+                        captures.append(Position(self.position.row - i, self.position.col + i))
+                        break
+                else:
+                    break
+            for i in range(1, 9):
+                if self.position.row - i >= 0 and self.position.col - i >= 0:
+                    if board_arr[self.position.row - i][self.position.col - i] is not None:
+                        captures.append(Position(self.position.row - i, self.position.col - i))
+                        break
+                else:
+                    break
+        
+        return captures
 
 
     @classmethod
@@ -382,16 +444,19 @@ class Board:
 
 
 def main():
-    board = Board.from_FEN("8/4B3/6N1/8/1B6/3n4/8/8 w KQkq ")
+    board = Board.from_FEN("1Q3R2/nnp1P1Pq/pPpP1B1k/3prNp1/P1p1B1P1/1K1pb1pP/1P3NRb/2r5")
     arr = board.get_str_arr()
     for i in arr:
         print(*i)
     for piece in board.pieces:
         arr_ = copy.deepcopy(arr)
         moves = Piece.correct_moves(piece, board.arr, board.prev_arr)
+        c = Piece.correct_captures(piece, board.arr, board.prev_arr)
         print(piece)
         for move in moves:
             arr_[7-move.row][move.col] = "XX"
+        for capture in c:
+            arr_[7-capture.row][capture.col] = "**"
         pos = piece.position
         arr_[7-pos.row][pos.col] = "OO"
         for i in arr_:
