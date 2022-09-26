@@ -27,7 +27,14 @@ class Position:
         self.row = row
         self.col = col
 
+    def __str__(self):
+        return f"({self.row}, {self.col})"
 
+    def __repr__(self):
+        return f"Position({self.row}, {self.col})"
+    
+    def __eq__(self, other): 
+        return self.row == other.row and self.col == other.col
 class Move:
     """A move in a chess game. Has a start and end position."""
 
@@ -103,7 +110,7 @@ class Piece:
                     moves.append(
                         Position(self.position.row - 2, self.position.col))
 
-        elif self.name == "rook" or self.name == "queen":
+        if self.name == "rook" or self.name == "queen":
             for i in range(self.position.row+1, 8):
                 if board_arr[i][self.position.col] == None:
                     moves.append(Position(i, self.position.col))
@@ -125,7 +132,7 @@ class Piece:
                 else:
                     break
 
-        elif self.name == "knight":
+        if self.name == "knight":
             for i in range(-2, 3):
                 for j in range(-2, 3):
                     if abs(i) + abs(j) == 3:
@@ -133,8 +140,9 @@ class Piece:
                             moves.append(
                                 Position(self.position.row + i, self.position.col + j))
 
-        elif self.name == "bishop" or self.name == "queen":
+        if self.name == "bishop" or self.name == "queen":
             for i in range(1, 9):
+                print(i)
                 if self.position.row + i <= 7 and self.position.col + i <= 7:
                     if board_arr[self.position.row + i][self.position.col + i] == None:
                         moves.append(
@@ -144,6 +152,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
+                print(i)
                 if self.position.row + i <= 7 and self.position.col - i >= 0:
                     if board_arr[self.position.row + i][self.position.col - i] == None:
                         moves.append(
@@ -153,6 +162,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
+                print(i)
                 if self.position.row - i >= 0 and self.position.col + i <= 7:
                     if board_arr[self.position.row - i][self.position.col + i] == None:
                         moves.append(
@@ -162,6 +172,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
+                print(i)
                 if self.position.row - i >= 0 and self.position.col - i >= 0:
                     if board_arr[self.position.row - i][self.position.col - i] == None:
                         moves.append(
@@ -176,12 +187,16 @@ class Piece:
                 for j in [-1,1]: 
                     if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] == None or board_arr[self.position.row + i][self.position.col + j].color != self.color):
                         king_moves.append(Position(self.position.row + i, self.position.col + j))
-            
-            for p in board_arr:
-                if p != None and p.color != self.color and p.name != "king":
-                    for move in p.correct_moves(board_arr, prev_board_arr):
-                        if move in king_moves:
-                            moves.append(move)
+            print(f"{king_moves=}")
+            for col in board_arr:
+                for p in col:
+                    if p != None and p.color != self.color and p.name != "king":
+                        for move in p.correct_moves(board_arr, prev_board_arr):
+                            for kmove in king_moves:
+                                if move == kmove:
+                                    king_moves.remove(kmove)
+            print(f"{king_moves=}")
+            return king_moves               
                     
                     
 
@@ -200,11 +215,14 @@ class Piece:
                     if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] != None and board_arr[self.position.row + i][self.position.col + j].color != self.color):
                         king_captures.append(
                             Position(self.position.row + i, self.position.col + j))
-            for p in board_arr:
-                if p != None and p.color != self.color:
-                    for move in p.correct_moves(board_arr, prev_board_arr):
-                        if move in king_captures != "king":
-                            captures.append(move)
+            for row in board_arr:
+                for p in row:
+                    if p != None and p.color != self.color and p.name != "king":
+                        for move in p.correct_moves(board_arr, prev_board_arr):
+                            for kmove in king_captures:
+                                if move == kmove:
+                                    king_captures.remove(kmove)
+            return king_captures
         if self.name == "pawn": # pawn captures
             if self.color == Color.WHITE:
                 if self.position.row != 7 and self.position.col != 0 and board_arr[self.position.row+1][self.position.col-1] != None and board_arr[self.position.row+1][self.position.col-1].color == Color.BLACK:
@@ -340,14 +358,15 @@ class Piece:
 
 
 class Board:
-    def __init__(self, pieces=None):
+    def __init__(self, pieces=None, active_color=Color.WHITE):
         if pieces is None:
             self.pieces = Board.new_board()
         else:
             self.pieces = pieces
         self.arr = self.get_piece_arr()
         self.prev_arr = copy.deepcopy(self.arr)
-
+        self.score = {Color.BLACK: 0, Color.WHITE: 0}
+        self.active_color = active_color
     @classmethod
     def new_board(cls):
         """Creates a new board with all pieces in their starting positions
@@ -402,18 +421,28 @@ class Board:
 
 
     def move_piece(self, piece,  new_pos):
-        """Moves a piece to a new position
-
-        Args:
-            piece (_type_): _description_
-            new_pos (_type_): _description_
-
-        Raises:
-            NotImplementedError: _description_
-        """
-        Piece.correct_moves(piece, self.arr, self.prev_arr)
-        piece.position = new_pos
-        raise NotImplementedError
+        corr_moves = Piece.correct_moves(piece, self.arr, self.prev_arr)
+        corr_captures = Piece.correct_captures(piece, self.arr, self.prev_arr)
+        print(corr_moves)
+        if piece.color != self.active_color:
+            return False
+        if new_pos in corr_moves:
+            piece.position = new_pos
+            self.arr = self.get_piece_arr()
+            self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
+            return True
+        
+        elif new_pos in corr_captures:
+            eaten_piece = self.arr[new_pos.row][new_pos.col]
+            self.arr[new_pos.row][new_pos.col] = None
+            self.pieces.remove(eaten_piece)
+            self.score[piece.color] += eaten_piece.value
+            
+            piece.position = new_pos
+            self.arr = self.get_piece_arr()
+            self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
+            return True
+        return False
 
     def get_piece_arr(self):
         """
@@ -442,24 +471,26 @@ class Board:
 
 
 def main():
-    board = Board.from_FEN("1Q3R2/nnp1P1Pq/pPpP1B1k/3prNp1/P1p1B1P1/1K1pb1pP/1P3NRb/2r5")
+    board = Board.from_FEN("8/4KP2/8/1k6/3Q4/8/8/8")
     arr = board.get_str_arr()
-    for i in arr:
-        print(*i)
-    for piece in board.pieces:
-        arr_ = copy.deepcopy(arr)
-        moves = Piece.correct_moves(piece, board.arr, board.prev_arr)
-        c = Piece.correct_captures(piece, board.arr, board.prev_arr)
-        print(piece)
-        for move in moves:
-            arr_[7-move.row][move.col] = "XX"
-        for capture in c:
-            arr_[7-capture.row][capture.col] = "**"
-        pos = piece.position
-        arr_[7-pos.row][pos.col] = "OO"
-        for i in arr_:
-            print(*i)
-
+    print(f"color: e" + ("White" if Color.WHITE else "Black") + f" W: {board.score[Color.WHITE]}, B: {board.score[Color.BLACK]}")
+    for n, i in enumerate(arr):
+        print(8-n, *i)
+    print("  a  b  c  d  e  f  g  h")
+    while True:
+        move = input("your move: ").split()
+        if move[0] == "exit":
+            break
+        first_pos = Position(int(move[0][1])-1, ord(move[0][0])-ord("a"))
+        last_pos = Position(int(move[1][1])-1, ord(move[1][0])-ord("a"))
+        print(first_pos, last_pos)
+        print(board.arr[first_pos.row][first_pos.col].position)
+        print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
+        arr = board.get_str_arr()
+        print(f"color: {board.active_color}, W: {board.score[Color.WHITE]}, B: {board.score[Color.BLACK]}")
+        for n, i in enumerate(arr):
+            print(8-n, *i)
+        print("  a  b  c  d  e  f  g  h")
 
 if __name__ == "__main__":
     main()
