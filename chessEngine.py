@@ -363,9 +363,7 @@ class Board:
         pieces = []
         for piece in pieces_list:
             for pos in Piece.get_start_position(piece[0], piece[1]):
-                pieces.append(
-                    
-                    Piece(piece[1], piece[0], Piece.get_value(piece[0]), pos))
+                pieces.append(Piece(piece[1], piece[0], Piece.get_value(piece[0]), pos))
         print(len(pieces))
 
         return pieces
