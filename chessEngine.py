@@ -35,18 +35,20 @@ class Position:
     
     def __eq__(self, other): 
         return self.row == other.row and self.col == other.col
-class Move:
-    """A move in a chess game. Has a start and end position."""
 
-    def __init__(self, start: Position, end: Position):
-        """_summary_
 
-        Args:
-            start (Position): _description_
-            end (Position): _description_
-        """
-        self.start = start
-        self.end = end
+# class Move:
+#     """A move in a chess game. Has a start and end position."""
+
+#     def __init__(self, start: Position, end: Position):
+#         """_summary_
+
+#         Args:
+#             start (Position): _description_
+#             end (Position): _description_
+#         """
+#         self.start = start
+#         self.end = end
 
 
 
@@ -442,6 +444,7 @@ class Board:
             self.arr = self.get_piece_arr()
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
             return True
+        
         return False
 
     def get_piece_arr(self):
@@ -471,7 +474,7 @@ class Board:
 
 
 def main():
-    board = Board.from_FEN("8/4KP2/8/1k6/3Q4/8/8/8")
+    board = Board()
     arr = board.get_str_arr()
     print(f"color: e" + ("White" if Color.WHITE else "Black") + f" W: {board.score[Color.WHITE]}, B: {board.score[Color.BLACK]}")
     for n, i in enumerate(arr):
