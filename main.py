@@ -13,13 +13,13 @@ import sys
 import copy
 import time
 import queue
-import pygame
 import tkinter
 import itertools
 import threading
 import subprocess
 import customtkinter
 import tkinter.messagebox
+import tkinter.font as tkFont
 import platform
 if platform.system == "Windows":
     os.environ['SDL_VIDEODRIVER'] = 'windib'
@@ -35,59 +35,27 @@ customtkinter.set_default_color_theme("blue")
 #    Параметры шахматной доски    #
 #                                 #
 ###################################
-B_WIDTH = B_HEIGHT = 480            # width and height of the chess board
+B_WIDTH = B_HEIGHT = 640            # width and height of the chess board
 DIMENSION = 8                       # the dimensions of the chess board
 SQ_SIZE = B_HEIGHT // DIMENSION     # the size of each of the squares in the board
+
 IMAGES = {}                         # images for the chess pieces
-MAX_FPS = 60                        # FPS for animations
-pieceDir = "Assets/Pieces/"         # Стандартная папка для изображений фигур
+pieceDir = "Assets/PiecesSimple/"   # Стандартная папка для изображений фигур
 
-def loadImages():
-    """Загрузка изображений для шахматных фигур из класса chessBoard
-    """
-    pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ',
-              'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
-    for piece in pieces:
-        IMAGES[piece] = pygame.transform.scale(pygame.image.load(pieceDir + piece + ".png"), (SQ_SIZE, SQ_SIZE))
-
-
-def loadBoard(screen, chessboard):
-    """Загрузка шахматной доски
-    """
-    drawBoard(screen)
-    drawPieces(screen, chessboard.board)
-
-
-def drawBoard(screen):
-    """Рисование шахматной доски
-    """
-    colors = [pygame.Color("#edede9"), pygame.Color("#457b9d")]
-    # for i in range(DIMENSION): for j in range(DIMENSION):
-    for i, j in itertools.product(range(DIMENSION), range(DIMENSION)):
-        color = colors[((i+j) % 2)]
-        pygame.draw.rect(screen, color, pygame.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
-def drawPieces(screen, chessboard):
-    """Рисование шахматных фигур
-    """
-    for i, j in itertools.product(range(DIMENSION), range(DIMENSION)):
-        piece = chessboard[i][j]
-        if piece != "--":
-            screen.blit(IMAGES[piece], pygame.Rect(j*SQ_SIZE, i*SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
-
- #####################################################
- #                                                   #
- #    Создание окна для работы пользователя - GUI    #
- #                                                   #
- #####################################################
+#####################################################
+#                                                   #
+#    Создание окна для работы пользователя - GUI    #
+#                                                   #
+#####################################################
 class App(customtkinter.CTk):
-    WIDTH = 750  # Задание ширины окна приложения
-    HEIGHT = 500  # Задание высоты окна приложения
+    WIDTH = 910  # Задание ширины окна приложения
+    HEIGHT = 690  # Задание высоты окна приложения
 
     def __init__(self):
         super().__init__()  # Определение родительского класса
+        self.resizable(False, False)
+        B_COLOR_WHITE = "#edede9"
+        B_COLOR_BLACK = "#457b9d"
 
         ##########################################
         #                                        #
@@ -158,23 +126,140 @@ class App(customtkinter.CTk):
         #    Окно для игр в шахматы    #
         #                              #
         ################################
-        # Настройка макета сетки        
-        # screen = pygame.display.set_mode((B_WIDTH, B_HEIGHT))
+        # Настройка макета сетки
         self.frame_right_play.rowconfigure(14, weight=10)
-        self.frame_right_play.columnconfigure(0, weight=1) 
-        self.label_info_play = customtkinter.CTkLabel(master=self.frame_right_play, height=100, text_font=("Roboto Medium", -16), fg_color=("white", "gray38"), justify=tkinter.LEFT, text="\n \n")
-        self.label_info_play.grid(row=1, column=0, sticky="we", padx=15, pady=15)
-        
-        screen = pygame.display.set_mode((B_WIDTH, B_HEIGHT))
-        clock = pygame.time.Clock()
-        screen.fill(pygame.Color("black"))  
-        board = chessBoard.chessBoard()
-        loadImages()
-        loadBoard(screen, board)
-        
-        print(type(screen)) # <class 'pygame.Surface'>
+        self.frame_right_play.columnconfigure(0, weight=1)
+        self.frame_board = customtkinter.CTkFrame(master=self.frame_right_play, fg_color=("gray75", "#64897e"))
+        self.frame_board.grid(row=0, column=0, sticky="nswe", padx=5, pady=5)
+        self.ButtonA1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA1.grid(row=0, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonA2.grid(row=0, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonA3.grid(row=0, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonA4.grid(row=0, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonA5.grid(row=0, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonA6.grid(row=0, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonA7.grid(row=0, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonA8.grid(row=0, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonB1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB1.grid(row=1, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonB2.grid(row=1, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonB3.grid(row=1, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonB4.grid(row=1, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonB5.grid(row=1, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonB6.grid(row=1, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonB7.grid(row=1, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonB8.grid(row=1, column=7, sticky="sw", padx=0, pady=0)        
+        self.ButtonC1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonC1.grid(row=2, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonC2.grid(row=2, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonC3.grid(row=2, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonC4.grid(row=2, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonC5.grid(row=2, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonC6.grid(row=2, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonC7.grid(row=2, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonC8.grid(row=2, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonD1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonD1.grid(row=3, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonD2.grid(row=3, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonD3.grid(row=3, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonD4.grid(row=3, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonD5.grid(row=3, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonD6.grid(row=3, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonD7.grid(row=3, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonD8.grid(row=3, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonE1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonE1.grid(row=4, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonE2.grid(row=4, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonE3.grid(row=4, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonE4.grid(row=4, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonE5.grid(row=4, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonE6.grid(row=4, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonE7.grid(row=4, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonE8.grid(row=4, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonF1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonF1.grid(row=5, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonF2.grid(row=5, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonF3.grid(row=5, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonF4.grid(row=5, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonF5.grid(row=5, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonF6.grid(row=5, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonF7.grid(row=5, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonF8.grid(row=5, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonG1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG1.grid(row=6, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonG2.grid(row=6, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonG3.grid(row=6, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonG4.grid(row=6, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonG5.grid(row=6, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonG6.grid(row=6, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonG7.grid(row=6, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonG8.grid(row=6, column=7, sticky="sw", padx=0, pady=0)
+        self.ButtonH1 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH2 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH3 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH4 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH5 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH6 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH7 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH8 = customtkinter.CTkButton(master=self.frame_board, fg_color=("gray75", B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH1.grid(row=7, column=0, sticky="sw", padx=0, pady=0)
+        self.ButtonH2.grid(row=7, column=1, sticky="sw", padx=0, pady=0)
+        self.ButtonH3.grid(row=7, column=2, sticky="sw", padx=0, pady=0)
+        self.ButtonH4.grid(row=7, column=3, sticky="sw", padx=0, pady=0)
+        self.ButtonH5.grid(row=7, column=4, sticky="sw", padx=0, pady=0)
+        self.ButtonH6.grid(row=7, column=5, sticky="sw", padx=0, pady=0)
+        self.ButtonH7.grid(row=7, column=6, sticky="sw", padx=0, pady=0)
+        self.ButtonH8.grid(row=7, column=7, sticky="sw", padx=0, pady=0)
 
-        
 
         ##########################################
         #                                        #
@@ -240,16 +325,6 @@ class App(customtkinter.CTk):
 #                                #
 ##################################
 if __name__ == "__main__":
-    pygame.init()
-
-    # # print(board.board) # debug
-    # running = True
-    # while running:
-    #     for e in pygame.event.get():
-    #         if e.type == pygame.QUIT:
-    #             running = False
-    #         clock.tick(MAX_FPS)
-    #         pygame.display.flip()
-
     app = App()
     app.start()
+    
