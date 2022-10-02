@@ -8,6 +8,7 @@
 #                                                                                                  #
 ####################################################################################################
 
+from ctypes.wintypes import WPARAM
 import os
 import sys
 import cv2
@@ -30,7 +31,7 @@ if platform.system == "Windows":
 import chessBoard
 import chessEngine
 
-customtkinter.set_appearance_mode("system")
+customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")
 
 ###################################
@@ -38,22 +39,15 @@ customtkinter.set_default_color_theme("blue")
 #    Параметры шахматной доски    #
 #                                 #
 ###################################
-B_WIDTH = B_HEIGHT = 640            # width and height of the chess board
+B_WIDTH = B_HEIGHT = 720            # width and height of the chess board
 DIMENSION = 8                       # the dimensions of the chess board
 SQ_SIZE = B_HEIGHT // DIMENSION     # the size of each of the sWPquares in the board
 IMAGES = {}                         # images for the chess pieces
-pieceDir = "Assets/PiecesSimple/"   # Стандартная папка для изображений фигур
+pieceDir = "Assets/PiecesModern/"   # Стандартная папка для изображений фигур
 
 # photo = tkinter.PhotoImage(file = r"Assets/PiecesModern/bB.png") # Creating a photoimage object to use image
 # photoimage = photo.subsample(8, 8) # Resizing image to fit on button
-
-def load_images():
-    '''Load images for the chess pieces
-    '''
-    files = glob.glob(f"{pieceDir}*.png")
-    for myFile in files:
-        image = cv2.imread(myFile)
-        IMAGES.append(image)
+    
 
 #####################################################
 #                                                   #
@@ -61,20 +55,31 @@ def load_images():
 #                                                   #
 #####################################################
 class App(customtkinter.CTk):
-    WIDTH = 910  # Задание ширины окна приложения
-    HEIGHT = 690  # Задание высоты окна приложения
+    WIDTH = 990  # Задание ширины окна приложения
+    HEIGHT = 770  # Задание высоты окна приложения
 
     def __init__(self):
         super().__init__()  # Определение родительского класса
         self.resizable(False, False)
-        B_COLOR_WHITE = "#edede9"
-        B_COLOR_BLACK = "#457b9d"
+        B_COLOR_WHITE = "#f9dcc4"
+        B_COLOR_BLACK = "#023047"
 
-        ##########################################
-        #                                        #
-        #    Присвение значений по умолчанию     #
-        #                                        #
-        ##########################################
+        BB = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bB.png')).subsample(8, 8)
+        BP = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bp.png')).subsample(8, 8)
+        BN = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bN.png')).subsample(8, 8)
+        BR = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bR.png')).subsample(8, 8)
+        BQ = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bQ.png')).subsample(8, 8)
+        BK = tkinter.PhotoImage(file = os.path.join(pieceDir, 'bK.png')).subsample(8, 8)
+        blank = tkinter.PhotoImage(file = os.path.join("Assets/Pieces/", 'blank.png')).subsample(8, 8)
+        WB = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wB.png')).subsample(8, 8)
+        WP = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wp.png')).subsample(8, 8)
+        WN = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wN.png')).subsample(8, 8)
+        WR = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wR.png')).subsample(8, 8)
+        WQ = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wQ.png')).subsample(8, 8)
+        WK = tkinter.PhotoImage(file = os.path.join(pieceDir, 'wK.png')).subsample(8, 8)
+
+        
+
         self.title("Игра в Шахматы")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         # self.minsize(App.WIDTH, App.HEIGHT)
@@ -125,13 +130,27 @@ class App(customtkinter.CTk):
         #                                             #
         ###############################################
         # Настройка макета сетки
+        # Настройка макета сетки
         self.frame_right_info.rowconfigure(14, weight=10)
         self.frame_right_info.columnconfigure(0, weight=1)
-        self.label_info = customtkinter.CTkLabel(master=self.frame_right_info, text="Информация о программе", text_font=("Roboto Medium", -16))
+
+        self.label_info = customtkinter.CTkLabel(master=self.frame_right_info, text="Информация о программе",
+                                                 text_font=("Roboto Medium", -16))
         self.label_info.grid(row=0, column=0, pady=10, padx=10)
-        self.label_info_info = customtkinter.CTkLabel(master=self.frame_right_info, height=100, text_font=("Roboto Medium", -16), fg_color=("white", "gray38"), justify=tkinter.LEFT, text="\n \n")
+
+        self.label_info_info = customtkinter.CTkLabel(master=self.frame_right_info, height=100,
+                                                      text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
+                                                      justify=tkinter.LEFT,
+                                                      text=" \nРеализация клиент-серверной программной системы \"Игра в Шахматы\". \n")
         self.label_info_info.grid(row=1, column=0, sticky="we", padx=15, pady=15)
-        self.label_info_authors = customtkinter.CTkLabel(master=self.frame_right_info, height=200, text_font=("Roboto Medium", -16), fg_color=("white", "gray38"), text="\n \n")
+
+        self.label_info_authors = customtkinter.CTkLabel(master=self.frame_right_info, height=200,
+                                                         text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
+                                                         justify=tkinter.LEFT,
+                                                         text="\nРазработкой занимались студенты СПбГЭТУ (ЛЭТИ), гр. 1308:\n\n" +
+                                                              "Мельник Даниил" + "; \n" +
+                                                              "Томилов Даниил" + "; \n" +
+                                                              "Лепов Алексей" + ". \n")
         self.label_info_authors.grid(row=2, column=0, sticky="we", padx=15, pady=15)
         
         ################################
@@ -140,19 +159,18 @@ class App(customtkinter.CTk):
         #                              #
         ################################
         # Настройка макета сетки
-        
         self.frame_right_play.rowconfigure(14, weight=10)
         self.frame_right_play.columnconfigure(0, weight=1)
         self.frame_board = customtkinter.CTkFrame(master=self.frame_right_play, fg_color=(B_COLOR_WHITE, B_COLOR_BLACK))
         self.frame_board.grid(row=0, column=0, sticky="nswe", padx=5, pady=5)
-        self.ButtonA1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonA8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonA1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BR)
+        self.ButtonA2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BN)
+        self.ButtonA3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BB)
+        self.ButtonA4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BQ)
+        self.ButtonA5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BK)
+        self.ButtonA6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BB)
+        self.ButtonA7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BN)
+        self.ButtonA8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BR)
         self.ButtonA1.grid(row=0, column=0, sticky="sw", padx=0, pady=0)
         self.ButtonA2.grid(row=0, column=1, sticky="sw", padx=0, pady=0)
         self.ButtonA3.grid(row=0, column=2, sticky="sw", padx=0, pady=0)
@@ -161,14 +179,14 @@ class App(customtkinter.CTk):
         self.ButtonA6.grid(row=0, column=5, sticky="sw", padx=0, pady=0)
         self.ButtonA7.grid(row=0, column=6, sticky="sw", padx=0, pady=0)
         self.ButtonA8.grid(row=0, column=7, sticky="sw", padx=0, pady=0)
-        self.ButtonB1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonB8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonB1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
+        self.ButtonB8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = BP)
         self.ButtonB1.grid(row=1, column=0, sticky="sw", padx=0, pady=0)
         self.ButtonB2.grid(row=1, column=1, sticky="sw", padx=0, pady=0)
         self.ButtonB3.grid(row=1, column=2, sticky="sw", padx=0, pady=0)
@@ -241,14 +259,14 @@ class App(customtkinter.CTk):
         self.ButtonF6.grid(row=5, column=5, sticky="sw", padx=0, pady=0)
         self.ButtonF7.grid(row=5, column=6, sticky="sw", padx=0, pady=0)
         self.ButtonF8.grid(row=5, column=7, sticky="sw", padx=0, pady=0)
-        self.ButtonG1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonG8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonG1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
+        self.ButtonG8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WP)
         self.ButtonG1.grid(row=6, column=0, sticky="sw", padx=0, pady=0)
         self.ButtonG2.grid(row=6, column=1, sticky="sw", padx=0, pady=0)
         self.ButtonG3.grid(row=6, column=2, sticky="sw", padx=0, pady=0)
@@ -257,14 +275,14 @@ class App(customtkinter.CTk):
         self.ButtonG6.grid(row=6, column=5, sticky="sw", padx=0, pady=0)
         self.ButtonG7.grid(row=6, column=6, sticky="sw", padx=0, pady=0)
         self.ButtonG8.grid(row=6, column=7, sticky="sw", padx=0, pady=0)
-        self.ButtonH1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
-        self.ButtonH8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "")
+        self.ButtonH1 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WR)
+        self.ButtonH2 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WN)
+        self.ButtonH3 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WB)
+        self.ButtonH4 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WQ)
+        self.ButtonH5 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WK)
+        self.ButtonH6 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WB)
+        self.ButtonH7 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WN)
+        self.ButtonH8 = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_play_event, text = "", image = WR)
         self.ButtonH1.grid(row=7, column=0, sticky="sw", padx=0, pady=0)
         self.ButtonH2.grid(row=7, column=1, sticky="sw", padx=0, pady=0)
         self.ButtonH3.grid(row=7, column=2, sticky="sw", padx=0, pady=0)
