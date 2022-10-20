@@ -7,18 +7,16 @@
 #    ##########################################################################################    #
 #                                                                                                  #
 ####################################################################################################
-
-from ctypes.wintypes import WPARAM
 import os
 import sys
 import tkinter
+import platform
 import itertools
-import threading
-import subprocess
 import customtkinter
 import tkinter.messagebox
-import tkinter.font as tkFont
-import platform
+
+from ctypes.wintypes import WPARAM
+
 if platform.system == "Windows":
     os.environ['SDL_VIDEODRIVER'] = 'windib'
 
@@ -38,16 +36,15 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()  # Определение родительского класса
 
-        customtkinter.set_appearance_mode("dark")
-        customtkinter.set_default_color_theme("blue")
-        self.resizable(False, False)
-        B_WIDTH = B_HEIGHT = 720            # width and height of the chess board
-        DIMENSION = 8                       # the dimensions of the chess board
-        SQ_SIZE = B_HEIGHT // DIMENSION     # the size of each of the sWPquares in the board
-        PIECE_DIR = "Assets/PiecesModern/"  # Стандартная папка для изображений фигур
-        B_COLOR_WHITE = "#f9dcc4"           # Стандартный цвет для белых полей доски
-        B_COLOR_BLACK = "#023047"           # Standart color for black chessboard fields (для черных)
-        CURRENT_COLOR = chessEngine.Color.WHITE
+        customtkinter.set_appearance_mode("dark")       # изменение темы НА ТЕМНУЮ
+        customtkinter.set_default_color_theme("blue")   # изменение темы (ЦВЕТОВАЯ ПАЛИТРА)
+        B_WIDTH = B_HEIGHT = 720                        # width and height of the chess board
+        DIMENSION = 8                                   # the dimensions of the chess board
+        SQ_SIZE = B_HEIGHT // DIMENSION                 # the size of each of the sWPquares in the board
+        PIECE_DIR = "Assets/PiecesModern/"              # Стандартная папка для изображений фигур
+        B_COLOR_WHITE = "#f9dcc4"                       # Стандартный цвет для белых полей доски
+        B_COLOR_BLACK = "#023047"                       # Standart color for black chessboard fields (для черных)
+        CURRENT_COLOR = chessEngine.Color.WHITE         # Цвет игрока по умолчанию
 
         BB = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'bB.png')).subsample(DIMENSION, DIMENSION)
         BP = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'bp.png')).subsample(DIMENSION, DIMENSION)
@@ -55,7 +52,6 @@ class App(customtkinter.CTk):
         BR = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'bR.png')).subsample(DIMENSION, DIMENSION)
         BQ = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'bQ.png')).subsample(DIMENSION, DIMENSION)
         BK = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'bK.png')).subsample(DIMENSION, DIMENSION)
-        BLANCK = tkinter.PhotoImage(file = os.path.join("Assets/BLANK/", 'BLANK_512x512.png')).subsample(DIMENSION, DIMENSION)
         WB = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wB.png')).subsample(DIMENSION, DIMENSION)
         WP = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wp.png')).subsample(DIMENSION, DIMENSION)
         WN = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wN.png')).subsample(DIMENSION, DIMENSION)
@@ -63,6 +59,47 @@ class App(customtkinter.CTk):
         WQ = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wQ.png')).subsample(DIMENSION, DIMENSION)
         WK = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wK.png')).subsample(DIMENSION, DIMENSION)
 
+        #####################################
+        #                                   #
+        #    Класс для изображений фигур    #
+        #                                   #
+        #####################################
+        class imagePiece:
+            def __init__(self, name, color):
+                if color == chessEngine.Color.WHITE:
+                    if name == "pawn":
+                        self.image = WP
+                    elif name == "knight":
+                        self.image = WN
+                    elif name == "bishop":
+                        self.image = WB
+                    elif name == "rook":
+                        self.image = WR
+                    elif name == "queen":
+                        self.image = WQ
+                    elif name == "king":
+                        self.image = WK
+                    else:
+                        raise ValueError("Invalid piece name")
+                elif color == chessEngine.Color.BLACK:
+                    if name == "pawn":
+                        self.image = BP
+                    elif name == "knight":
+                        self.image = BN
+                    elif name == "bishop":
+                        self.image = BB
+                    elif name == "rook":
+                        self.image = BR
+                    elif name == "queen":
+                        self.image = BQ
+                    elif name == "king":
+                        self.image = BK
+                    else:
+                        raise ValueError("Invalid piece name")
+                else:
+                    raise ValueError("Invalid color")
+
+        self.resizable(False, False)
         self.title("Игра в Шахматы")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         # self.minsize(App.WIDTH, App.HEIGHT)
@@ -134,8 +171,9 @@ class App(customtkinter.CTk):
                                                          text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
                                                          justify=tkinter.LEFT,
                                                          text="\nРазработкой занимались студенты СПбГЭТУ (ЛЭТИ), гр. 1308:\n\n" +
-                                                              "Мельник Даниил" + "; \n" +
                                                               "Томилов Даниил" + "; \n" +
+                                                              "Макаров Максим" + "; \n" +
+                                                              "Мельник Даниил" + "; \n" +
                                                               "Лепов Алексей" + ". \n")
         self.label_info_authors.grid(row=2, column=0, sticky="we", padx=15, pady=15)
 
@@ -154,51 +192,25 @@ class App(customtkinter.CTk):
         self.ButtonField = [[0 for _ in range(8)] for _ in range(8)]
 
         for i, j in itertools.product(range(8), range(8)):
-            self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_field_event, text="") if ((i + j) % 2) == 0 else customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_field_event, text="")
+            if ((i + j) % 2) == 0:
+                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_BLACK, B_COLOR_BLACK), width=SQ_SIZE, height=SQ_SIZE, command=self.button_field_event, text="") 
+            else:
+                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, fg_color=(B_COLOR_WHITE, B_COLOR_WHITE), width=SQ_SIZE, height=SQ_SIZE, command=self.button_field_event, text="")
             self.ButtonField[i][j].grid(row=7-i, column=j, sticky="sw", padx=0, pady=0)
 
-        if CURRENT_COLOR == chessEngine.Color.WHITE:
-            self.ButtonField[0][0].configure(image = WR)
-            self.ButtonField[0][1].configure(image = WN)
-            self.ButtonField[0][2].configure(image = WB)
-            self.ButtonField[0][3].configure(image = WQ)
-            self.ButtonField[0][4].configure(image = WK)
-            self.ButtonField[0][5].configure(image = WB)
-            self.ButtonField[0][6].configure(image = WN)
-            self.ButtonField[0][7].configure(image = WR)
-            for i in range(8):
-                self.ButtonField[1][i].configure(image = WP)
-            for i in range(8):
-                self.ButtonField[6][i].configure(image = BP)
-            self.ButtonField[7][0].configure(image = BR)
-            self.ButtonField[7][1].configure(image = BN)
-            self.ButtonField[7][2].configure(image = BB)
-            self.ButtonField[7][3].configure(image = BQ)
-            self.ButtonField[7][4].configure(image = BK)
-            self.ButtonField[7][5].configure(image = BB)
-            self.ButtonField[7][6].configure(image = BN)
-            self.ButtonField[7][7].configure(image = BR)
-        else:    
-            self.ButtonField[7][0].configure(image = WR)
-            self.ButtonField[7][1].configure(image = WN)
-            self.ButtonField[7][2].configure(image = WB)
-            self.ButtonField[7][3].configure(image = WQ)
-            self.ButtonField[7][4].configure(image = WK)
-            self.ButtonField[7][5].configure(image = WB)
-            self.ButtonField[7][6].configure(image = WN)
-            self.ButtonField[7][7].configure(image = WR)
-            for i in range(8):
-                self.ButtonField[1][i].configure(image = BP)
-            for i in range(8):
-                self.ButtonField[6][i].configure(image = WP)
-            self.ButtonField[0][0].configure(image = BR)
-            self.ButtonField[0][1].configure(image = BN)
-            self.ButtonField[0][2].configure(image = BB)
-            self.ButtonField[0][3].configure(image = BQ)
-            self.ButtonField[0][4].configure(image = BK)
-            self.ButtonField[0][5].configure(image = BB)
-            self.ButtonField[0][6].configure(image = BN)
-            self.ButtonField[0][7].configure(image = BR)
+
+        ##########################################
+        #                                        #
+        #    Вывод на экран начальной позиции    #
+        #                                        #
+        ##########################################
+        for strPiece in ["pawn","rook","knight","bishop","queen","king"]:
+            positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.WHITE) # "CURRENT_COLOR" пока не используется - необходимо дополнить "get_start_position" в "chessEngine"
+            for position in positions:
+                self.ButtonField[position.row][position.col].configure(image = imagePiece(strPiece, chessEngine.Color.WHITE).image)
+            positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.BLACK)
+            for position in positions:
+                self.ButtonField[position.row][position.col].configure(image = imagePiece(strPiece, chessEngine.Color.BLACK).image)
 
         ##########################################
         #                                        #
@@ -270,6 +282,14 @@ class App(customtkinter.CTk):
 
     def default_field_color(self):
         self.configure(fg_color=("7db8d4", "#7db8d4"))
+
+
+    #####################################
+    #                                   #
+    #    Функции для рисования фигур    #
+    #                                   #
+    #####################################
+
 
 
 ##################################
