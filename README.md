@@ -9,6 +9,10 @@
 
 ---
 
+https://user-images.githubusercontent.com/77492646/197358178-4cc20351-ce13-447a-94af-b9170a1ab9da.mov
+
+---
+
 ## IDEF0 - Context диаграмма
 <img alt="" src="https://raw.githubusercontent.com/AlexeyLepov/ClientServerChessApp/main/Documentation/IDEF0/IDEF0-Context.png" align="right"/>
 
