@@ -59,12 +59,21 @@ class App(customtkinter.CTk):
         WQ = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wQ.png')).subsample(DIMENSION, DIMENSION)
         WK = tkinter.PhotoImage(file = os.path.join(PIECE_DIR, 'wK.png')).subsample(DIMENSION, DIMENSION)
 
+        class piecePositionDetect:
+            def __init__(self, piece, row, col):
+                if piece.name == "king":
+                    first_pos = chessEngine.Position(int(move[0][1])-1, ord(move[0][0])-ord("a"))
+                    last_pos = Position(int(move[1][1])-1, ord(move[1][0])-ord("a"))
+                    chessEngine.Piece.move_piece(piece, name, (row, col))
+
+        
+
         #####################################
         #                                   #
         #    Класс для изображений фигур    #
         #                                   #
         #####################################
-        class imagePiece:
+        class pieceImage:
             def __init__(self, name, color):
                 if color == chessEngine.Color.WHITE:
                     if name == "pawn":
@@ -207,10 +216,10 @@ class App(customtkinter.CTk):
         for strPiece in ["pawn","rook","knight","bishop","queen","king"]:
             positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.WHITE) # "CURRENT_COLOR" пока не используется - необходимо дополнить "get_start_position" в "chessEngine"
             for position in positions:
-                self.ButtonField[position.row][position.col].configure(image = imagePiece(strPiece, chessEngine.Color.WHITE).image)
+                self.ButtonField[position.row][position.col].configure(image = pieceImage(strPiece, chessEngine.Color.WHITE).image)
             positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.BLACK)
             for position in positions:
-                self.ButtonField[position.row][position.col].configure(image = imagePiece(strPiece, chessEngine.Color.BLACK).image)
+                self.ButtonField[position.row][position.col].configure(image = pieceImage(strPiece, chessEngine.Color.BLACK).image)
 
         ##########################################
         #                                        #
