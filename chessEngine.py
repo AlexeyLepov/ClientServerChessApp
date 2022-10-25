@@ -182,23 +182,7 @@ class Piece:
                     else:
                         break
                 else:
-                    break
-        if self.name == "king":
-            king_moves = []
-            for i in [-1,1]:
-                for j in [-1,1]: 
-                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] == None or board_arr[self.position.row + i][self.position.col + j].color != self.color):
-                        king_moves.append(Position(self.position.row + i, self.position.col + j))
-            print(f"{king_moves=}")
-            for col in board_arr:
-                for p in col:
-                    if p != None and p.color != self.color and p.name != "king":
-                        for move in p.correct_moves(board_arr, prev_board_arr):
-                            for kmove in king_moves:
-                                if move == kmove:
-                                    king_moves.remove(kmove)
-            print(f"{king_moves=}")
-            return king_moves               
+                    break            
                     
                     
 
@@ -210,21 +194,6 @@ class Piece:
 
     def correct_captures(self, board_arr, prev_board_arr):
         captures = []
-        if self.name == "king":
-            king_captures = []
-            for i in [-1,1]:
-                for j in [-1,1]:
-                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (board_arr[self.position.row + i][self.position.col + j] != None and board_arr[self.position.row + i][self.position.col + j].color != self.color):
-                        king_captures.append(
-                            Position(self.position.row + i, self.position.col + j))
-            for row in board_arr:
-                for p in row:
-                    if p != None and p.color != self.color and p.name != "king":
-                        for move in p.correct_moves(board_arr, prev_board_arr):
-                            for kmove in king_captures:
-                                if move == kmove:
-                                    king_captures.remove(kmove)
-            return king_captures
         if self.name == "pawn": # pawn captures
             if self.color == Color.WHITE:
                 if self.position.row != 7 and self.position.col != 0 and board_arr[self.position.row+1][self.position.col-1] != None and board_arr[self.position.row+1][self.position.col-1].color == Color.BLACK:
