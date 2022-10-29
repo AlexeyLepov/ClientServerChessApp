@@ -293,7 +293,9 @@ class Piece:
                         break
                 else:
                     break
-        
+        for move in captures:
+            if board_arr[move.row][move.col].color == self.color:
+                captures.remove(move)
         return captures
 
 
