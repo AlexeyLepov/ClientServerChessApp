@@ -1,7 +1,7 @@
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 1. РџСЂРѕРіСЂР°РјРјРЅС‹Р№ РјРѕРґСѓР»СЊ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ Рё РїРѕСЃС‚СЂРѕРµРЅРёСЏ РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РёРЅС‚РµСЂС„РµР№СЃР°
+#   Pt. 1. Программный модуль инициализации приложения и построения графического интерфейса
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -29,7 +29,7 @@ import chessEngine
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 2. Р—Р°РґР°РЅРёРµ РёСЃС…РѕРґРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРєРЅР°
+#   Pt. 2. Задание исходных параметров окна
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -39,44 +39,46 @@ import chessEngine
 
 ##################################################################
 #                                                                #
-#    РћСЃРЅРѕРІРЅРѕР№ РєР»Р°СЃСЃ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ РѕРєРЅР° (GUI)    #
+#    Основной класс для создания пользовательского окна (GUI)    #
 #                                                                #
 ##################################################################
 class App(customtkinter.CTk):
     
     ##################################################################
     #                                                                #
-    #    Р—Р°РґР°РЅРёРµ РІС…РѕРґРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ Рё РєР»Р°СЃСЃР° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С†РІРµС‚Р°РјРё    #
+    #    Задание входных параметров и класса для работы с цветами    #
     #                                                                #
     ##################################################################
-    WIDTH = 1160                            # Р—Р°РґР°РЅРёРµ С€РёСЂРёРЅС‹ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
-    HEIGHT = 680                            # Р—Р°РґР°РЅРёРµ РІС‹СЃРѕС‚С‹ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ
+    WIDTH = 1160                            # Задание ширины окна приложения
+    HEIGHT = 680                            # Задание высоты окна приложения
     DIMENSION = 8                           # the dimensions of the chess board
     B_WIDTH = B_HEIGHT = 560                # width and height of the chess board
     SQ_SIZE = B_HEIGHT // DIMENSION         # the size of each of the sWPquares in the board
-    PIECE_DIR = "Assets/PiecesModern/"      # РЎС‚Р°РЅРґР°СЂС‚РЅР°СЏ РїР°РїРєР° РґР»СЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№ С„РёРіСѓСЂ
+    PIECE_DIR = "Assets/PiecesModern/"      # Стандартная папка для изображений фигур
     
-    # РєР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С†РІРµС‚Р°РјРё
+    board = None
+    # класс для работы с цветами
     class Colors:
-        Board_White = "#f9dcc4" # РЎС‚Р°РЅРґР°СЂС‚РЅС‹Р№ С†РІРµС‚ РґР»СЏ Р±РµР»С‹С… РїРѕР»РµР№ РґРѕСЃРєРё
-        Board_Black = "#023047" # Standart color for black chessboard fields (РґР»СЏ С‡РµСЂРЅС‹С…)
-        Field_Correct_Move = "#a7c957" # Р¦РІРµС‚ РґР»СЏ РїРѕР»РµР№, РІ РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РµС‚ С…РѕРґРёС‚СЊ С„РёРіСѓСЂР°
-        Field_Correct_Capture = "#f28482" # Р¦РІРµС‚ РїРѕР»РµР№, РІ РєРѕС‚РѕСЂС‹С… СЃС‚РѕРёС‚ РІСЂР°Р¶РµСЃРєР°СЏ С„РёРіСѓСЂР°
-        Users_Current = chessEngine.Color.WHITE # Р¦РІРµС‚ РёРіСЂРѕРєР°
+        Board_White = "#f9dcc4" # Стандартный цвет для белых полей доски
+        Board_Black = "#023047" # Standart color for black chessboard fields (для черных)
+        Field_Correct_Move = "#a7c957" # Цвет для полей, в которые может ходить фигура
+        Field_Correct_Capture = "#f28482" # Цвет полей, в которых стоит вражеская фигура
+        Moving_Piece = "#ff00ff" # Цвет перемещаемой фигуры
+        Users_Current = chessEngine.Color.WHITE # Цвет игрока
     
     ###################################################
     #                                                 #
-    #    РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєР»Р°СЃСЃР° РїСЂРё СЃРѕР·РґР°РЅРёРё РѕР±СЉРµРєС‚Р°    #
+    #    Инициализация класса при создании объекта    #
     #                                                 #
     ###################################################
     def __init__(self):
-        super().__init__()  # РћРїСЂРµРґРµР»РµРЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РєР»Р°СЃСЃР°
+        super().__init__()  # Определение родительского класса
 
-        # Р—Р°РґР°РЅРёРµ РёСЃС…РѕРґРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РѕРєРЅР°
-        customtkinter.set_appearance_mode("dark")       # РёР·РјРµРЅРµРЅРёРµ С‚РµРјС‹ РќРђ РўР•РњРќРЈР®
-        customtkinter.set_default_color_theme("dark-blue")   # РёР·РјРµРЅРµРЅРёРµ С‚РµРјС‹ (Р¦Р’Р•РўРћР’РђРЇ РџРђР›РРўР Рђ)
+        # Задание исходных параметров окна
+        customtkinter.set_appearance_mode("dark")       # изменение темы НА ТЕМНУЮ
+        customtkinter.set_default_color_theme("dark-blue")   # изменение темы (ЦВЕТОВАЯ ПАЛИТРА)
         self.resizable(False, False)
-        self.title("РРіСЂР° РІ РЁР°С…РјР°С‚С‹")
+        self.title("Игра в Шахматы")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         # self.minsize(App.WIDTH, App.HEIGHT)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -85,59 +87,26 @@ class App(customtkinter.CTk):
             self.bind("<Command-w>", self.on_closing)
             self.createcommand('tk::mac::Quit', self.on_closing)
         
-        # РЎС‡РёС‚С‹РІР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ С„РёРіСѓСЂ Рё "РїРѕРґРіРѕРЅРєР°" РїРѕ СЂР°Р·РјРµСЂСѓ РѕРґРЅРѕР№ РєР»РµС‚РєРё РІРёСЂС‚СѓР°Р»СЊРЅРѕР№ С€Р°С…РјР°С‚РЅРѕР№ РґРѕСЃРєРё
-        BB = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bB.png')).subsample(App.DIMENSION, App.DIMENSION)
-        BP = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bp.png')).subsample(App.DIMENSION, App.DIMENSION)
-        BN = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bN.png')).subsample(App.DIMENSION, App.DIMENSION)
-        BR = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bR.png')).subsample(App.DIMENSION, App.DIMENSION)
-        BQ = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bQ.png')).subsample(App.DIMENSION, App.DIMENSION)
-        BK = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bK.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WB = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wB.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WP = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wp.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WN = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wN.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WR = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wR.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WQ = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wQ.png')).subsample(App.DIMENSION, App.DIMENSION)
-        WK = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wK.png')).subsample(App.DIMENSION, App.DIMENSION)
+        # Считывание изображение фигур и "подгонка" по размеру одной клетки виртуальной шахматной доски
+        self.BB = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bB.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.BP = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bp.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.BN = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bN.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.BR = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bR.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.BQ = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bQ.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.BK = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bK.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WB = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wB.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WP = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wp.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WN = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wN.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WR = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wR.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WQ = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wQ.png')).subsample(App.DIMENSION, App.DIMENSION)
+        self.WK = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wK.png')).subsample(App.DIMENSION, App.DIMENSION)
 
         ################################################
         #                                              #
-        #    РљР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РёР·РѕР±СЂР°Р¶РµРЅРёСЏРјРё С„РёРіСѓСЂ    #
+        #    Класс для работы с изображениями фигур    #
         #                                              #
         ################################################
-        class pieceImage:
-            def __init__(self, name, color):
-                if color == chessEngine.Color.WHITE:
-                    if name == "pawn":
-                        self.image = WP
-                    elif name == "knight":
-                        self.image = WN
-                    elif name == "bishop":
-                        self.image = WB
-                    elif name == "rook":
-                        self.image = WR
-                    elif name == "queen":
-                        self.image = WQ
-                    elif name == "king":
-                        self.image = WK
-                    else:
-                        raise ValueError("Invalid piece name")
-                elif color == chessEngine.Color.BLACK:
-                    if name == "pawn":
-                        self.image = BP
-                    elif name == "knight":
-                        self.image = BN
-                    elif name == "bishop":
-                        self.image = BB
-                    elif name == "rook":
-                        self.image = BR
-                    elif name == "queen":
-                        self.image = BQ
-                    elif name == "king":
-                        self.image = BK
-                    else:
-                        raise ValueError("Invalid piece name")
-                else:
-                    raise ValueError("Invalid color")
+
 
 
 
@@ -145,7 +114,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 3. РЎРѕР·РґР°РЅРёРµ РїР°РЅРµР»РµР№ (С„СЂРµР№РјРѕРІ)
+#   Pt. 3. Создание панелей (фреймов)
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -155,13 +124,13 @@ class App(customtkinter.CTk):
 
         #################################################
         #                                               #
-        #    РЎРѕР·РґР°РЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРёС… РїР°РЅРµР»РµР№ (С„СЂРµР№РјРѕРІ)    #
+        #    Создание родительских панелей (фреймов)    #
         #                                               #
         #################################################
-        # РќР°СЃС‚СЂРѕР№РєР° РјР°РєРµС‚Р° СЃРµС‚РєРё (1x2)
+        # Настройка макета сетки (1x2)
         self.grid_columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        # РЎРѕР·РґР°РЅРёРµ РѕРєРѕРЅ (1x2)
+        # Создание окон (1x2)
         self.frame_menu = customtkinter.CTkFrame(master=self, width=140, corner_radius=0)
         self.frame_menu.grid(row=0, column=0, sticky="nswe")
         self.frame_playClient = customtkinter.CTkFrame(master=self)
@@ -173,60 +142,60 @@ class App(customtkinter.CTk):
         
         ########################################
         #                                      #
-        #    РЎРѕР·РґР°РЅРёРµ Р±РѕРєРѕРІРѕР№ РїР°РЅРµР»Рё (РњР•РќР®)    #
+        #    Создание боковой панели (МЕНЮ)    #
         #                                      #
         ########################################
-        # РќР°СЃС‚СЂРѕР№РєР° РјР°РєРµС‚Р° СЃРµС‚РєРё
+        # Настройка макета сетки
         self.frame_menu.grid_rowconfigure(6, weight=1)
         self.frame_menu.grid_rowconfigure(11, minsize=10)
-        self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="РњР•РќР®", text_font=("Roboto Medium", -16))
+        self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="МЕНЮ", text_font=("Roboto Medium", -16))
         self.label_menu.grid(row=0, column=0, pady=10, padx=10)
-        # РљРЅРѕРїРєРё
-        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="РРіСЂР°С‚СЊ\nСЃ РєР»РёРµРЅС‚РѕРј", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playClient_event)
+        # Кнопки
+        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Играть\nс клиентом", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playClient_event)
         self.button_playClient.grid(row=1, column=0, pady=10, padx=10)
-        self.button_playBot = customtkinter.CTkButton(master=self.frame_menu, text="РРіСЂР°С‚СЊ\nСЃ Р±РѕС‚РѕРј", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playBot_event)
+        self.button_playBot = customtkinter.CTkButton(master=self.frame_menu, text="Играть\nс ботом", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playBot_event)
         self.button_playBot.grid(row=2, column=0, pady=10, padx=10)
-        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="Рћ РїСЂРѕРіСЂР°РјРјРµ", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
+        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
         self.button_info.grid(row=3, column=0, pady=10, padx=10)
-        # РџРµСЂРµРєР»СЋС‡Р°С‚РµР»СЊ С‚РµРјРЅРѕР№ С‚РµРјС‹
-        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="РўРµРјРЅР°СЏ С‚РµРјР°", command=self.change_mode)
+        # Переключатель темной темы
+        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_mode)
         self.switch_dark_theme.grid(row=10, column=0, pady=10, padx=10, sticky="w")
 
         #################################################
         #                                               #
-        #    РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ Рѕ РїСЂРѕРіСЂР°РјРјРµ    #
+        #    Создание окна с информацией о программе    #
         #                                               #
         #################################################
-        # РќР°СЃС‚СЂРѕР№РєР° РјР°РєРµС‚Р° СЃРµС‚РєРё
+        # Настройка макета сетки
         self.frame_info.rowconfigure(14, weight=10)
         self.frame_info.columnconfigure(0, weight=1)
 
-        self.label_info = customtkinter.CTkLabel(master=self.frame_info, text="РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїСЂРѕРіСЂР°РјРјРµ",
+        self.label_info = customtkinter.CTkLabel(master=self.frame_info, text="Информация о программе",
                                                  text_font=("Roboto Medium", -16))
         self.label_info.grid(row=0, column=0, pady=10, padx=10)
 
         self.label_info_info = customtkinter.CTkLabel(master=self.frame_info, height=100,
                                                       text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
                                                       justify=tkinter.LEFT,
-                                                      text=" \nР РµР°Р»РёР·Р°С†РёСЏ РєР»РёРµРЅС‚-СЃРµСЂРІРµСЂРЅРѕР№ РїСЂРѕРіСЂР°РјРјРЅРѕР№ СЃРёСЃС‚РµРјС‹ \"РРіСЂР° РІ РЁР°С…РјР°С‚С‹\". \n")
+                                                      text=" \nРеализация клиент-серверной программной системы \"Игра в Шахматы\". \n")
         self.label_info_info.grid(row=1, column=0, sticky="we", padx=10, pady=10)
 
         self.label_info_authors = customtkinter.CTkLabel(master=self.frame_info, height=200,
                                                          text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
                                                          justify=tkinter.LEFT,
-                                                         text="\nР Р°Р·СЂР°Р±РѕС‚РєРѕР№ Р·Р°РЅРёРјР°Р»РёСЃСЊ СЃС‚СѓРґРµРЅС‚С‹ РЎРџР±Р“Р­РўРЈ (Р›Р­РўР), РіСЂ. 1308:\n\n" +
-                                                              "РўРѕРјРёР»РѕРІ Р”Р°РЅРёРёР»" + "; \n" +
-                                                              "РњР°РєР°СЂРѕРІ РњР°РєСЃРёРј" + "; \n" +
-                                                              "РњРµР»СЊРЅРёРє Р”Р°РЅРёРёР»" + "; \n" +
-                                                              "Р›РµРїРѕРІ РђР»РµРєСЃРµР№" + ". \n")
+                                                         text="\nРазработкой занимались студенты СПбГЭТУ (ЛЭТИ), гр. 1308:\n\n" +
+                                                              "Томилов Даниил" + "; \n" +
+                                                              "Макаров Максим" + "; \n" +
+                                                              "Мельник Даниил" + "; \n" +
+                                                              "Лепов Алексей" + ". \n")
         self.label_info_authors.grid(row=2, column=0, sticky="we", padx=10, pady=10)
 
         ####################################################
         #                                                  #
-        #    РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° РґР»СЏ РёРіСЂ РІ С€Р°С…РјР°С‚С‹ СЃ РєР»РёРµРЅС‚РѕРј    #
+        #    Создание окна для игр в шахматы с клиентом    #
         #                                                  #
         ####################################################
-        # РќР°СЃС‚СЂРѕР№РєР° РјР°РєРµС‚Р° СЃРµС‚РєРё
+        # Настройка макета сетки
         self.frame_playClient.rowconfigure(14, weight=10)
         self.frame_playClient.columnconfigure(0, weight=1)
         
@@ -247,7 +216,7 @@ class App(customtkinter.CTk):
     
         ###################################################
         #                                                 #
-        #    РЎРѕР·РґР°РЅРёРµ РѕРєРЅР° РґР»СЏ РёРіСЂ РІ С€Р°С…РјР°С‚С‹ СЃ СЂРѕР±РѕС‚РѕРј    #
+        #    Создание окна для игр в шахматы с роботом    #
         #                                                 #
         ###################################################
         ...
@@ -260,7 +229,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 4. Р—Р°РґР°РЅРёРµ РІС…РѕРґРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕСЃС‚РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
+#   Pt. 4. Задание входных параметров постинициализации
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -270,27 +239,26 @@ class App(customtkinter.CTk):
 
         ##########################################
         #                                        #
-        #    Р’С‹РІРѕРґ РЅР° СЌРєСЂР°РЅ РЅР°С‡Р°Р»СЊРЅРѕР№ РїРѕР·РёС†РёРё    #
+        #    Вывод на экран начальной позиции    #
         #                                        #
         ##########################################
         self.ButtonField = [[0 for _ in range(8)] for _ in range(8)]
 
+        
         for i, j in itertools.product(range(8), range(8)):
-            self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text="", command = lambda row=i,col=j: self.ButtonField_event(row,col))
+            self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text="")
             self.ButtonField[i][j].grid(row=7-i, column=j, sticky="sw", padx=0, pady=0)
         self.RecolorBoard()
-
-        for strPiece in ["pawn","rook","knight","bishop","queen","king"]:
-            positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.WHITE)
-            for position in positions:
-                self.ButtonField[position.row][position.col].configure(image = pieceImage(strPiece, chessEngine.Color.WHITE).image)
-            positions = chessEngine.Piece.get_start_position(strPiece, chessEngine.Color.BLACK)
-            for position in positions:
-                self.ButtonField[position.row][position.col].configure(image = pieceImage(strPiece, chessEngine.Color.BLACK).image)
+        
+        self.board = chessEngine.Board()
+        self.UpdateBoard()
+        
+        for i, j in itertools.product(range(8), range(8)):
+            self.ButtonField[i][j].command = lambda row=i,col=j: self.ButtonField_event(row,col)
 
         ##########################################
         #                                        #
-        #    РџСЂРёСЃРІРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ     #
+        #    Присвение значений по умолчанию     #
         #                                        #
         ##########################################
         self.hide_menu_frames()
@@ -307,17 +275,49 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 5. Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РѕРєРЅР°РјРё Рё РїР°РЅРµР»СЏРјРё (frames)
+#   Pt. 5. Функции для работы с окнами и панелями (frames)
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 
 
-
+    def pieceImage(self, name, color):
+        if color == chessEngine.Color.WHITE:
+            if name == "pawn":
+                return self.WP
+            elif name == "knight":
+                return self.WN
+            elif name == "bishop":
+                return self.WB
+            elif name == "rook":
+                return self.WR
+            elif name == "queen":
+                return self.WQ
+            elif name == "king":
+                return self.WK
+            else:
+                raise ValueError("Invalid piece name")
+        elif color == chessEngine.Color.BLACK:
+            if name == "pawn":
+                return self.BP
+            elif name == "knight":
+                return self.BN
+            elif name == "bishop":
+                return self.BB
+            elif name == "rook":
+                return self.BR
+            elif name == "queen":
+                return self.BQ
+            elif name == "king":
+                return self.BK
+            else:
+                raise ValueError("Invalid piece name")
+        else:
+            raise ValueError("Invalid color")
 
     ###################################################
     #                                                 #
-    #    Р¤СѓРЅРєС†РёРё РґР»СЏ РІС‹Р·РѕРІР° РѕРєРѕРЅ Рё РґСЂСѓРіРёС… С„СѓРЅРєС†РёР№     #
+    #    Функции для вызова окон и других функций     #
     #                                                 #
     ###################################################
     def hide_menu_frames(self):
@@ -330,7 +330,7 @@ class App(customtkinter.CTk):
 
     ##################################################
     #                                                #
-    #    Р¤СѓРЅРєС†РёРё РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°РјРё РѕРєРѕРЅ     #
+    #    Функции для управления параметрами окон     #
     #                                                #
     ##################################################
     def button_info_event(self):
@@ -359,7 +359,7 @@ class App(customtkinter.CTk):
 
     ################################
     #                              #
-    #    Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃРјРµРЅС‹ С‚РµРјС‹    #
+    #    Функция для смены темы    #
     #                              #
     ################################
     def change_mode(self):
@@ -370,7 +370,7 @@ class App(customtkinter.CTk):
 
     #################################################################
     #                                                               #
-    #    РЎРёСЃС‚РµРјРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ РІС‹Р·РѕРІР° Рё Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР° РїСЂРёР»РѕР¶РµРЅРёСЏ    #
+    #    Системные функции для вызова и закрытия окна приложения    #
     #                                                               #
     #################################################################
     def on_closing(self, event=0):
@@ -385,7 +385,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 6. Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„РёРіСѓСЂР°РјРё
+#   Pt. 6. Функции для работы с фигурами
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -395,25 +395,45 @@ class App(customtkinter.CTk):
 
     ######################################################
     #                                                    #
-    #    Р¤СѓРЅРєС†РёРё РґР»СЏ РЅР°Р¶Р°С‚РёСЏ РєРЅРѕРїРѕРє - С€Р°С…РјР°С‚РЅС‹С… РїРѕР»РµР№    #
+    #    Функции для нажатия кнопок - шахматных полей    #
     #                                                    #
     ######################################################
     def ButtonField_event(self,row,col):
-        # correct_moves - СЃРїРёСЃРѕРє С…РѕРґРѕРІ, РєРѕС‚РѕСЂС‹РјРё РјРѕР¶РµС‚ РѕРїРµСЂРёСЂРѕРІР°С‚СЊ С„РёРіСѓСЂР° - РєСЂРѕРјРµ С‚РµС…, РІ РєРѕС‚РѕСЂС‹С… РјРѕР¶РЅРѕ Р·Р°С…РІР°С‚РёС‚СЊ РІСЂР°РіР°
-        # correct_captures - СЃРїРёСЃРѕРє РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С… Р·Р°С…РІР°С‚РѕРІ РІСЂР¶РµСЃРєРёС… С„РёРіСѓСЂ
-        # move_piece - РѕСЃСѓС‰РµСЃС‚РІРёС‚СЊ РґРІРёР¶РµРЅРёРµ С„РёРіСѓСЂС‹
+        # correct_moves - список ходов, которыми может оперировать фигура - кроме тех, в которых можно захватить врага
+        # correct_captures - список всех возможных захватов вржеских фигур
+        # move_piece - осуществить движение фигуры
         position = self.SelectedField()
-        if position is None:
-            if (self.ButtonField[row][col].image != None):
-                self.ButtonField[row][col].configure(fg_color=(App.Colors.Field_Correct_Move, App.Colors.Field_Correct_Move))
-        else:
-            self.ButtonField[row][col].configure(image = self.ButtonField[position.row][position.col].image)
-            self.ButtonField[position.row][position.col].configure(image = None)
-            self.RecolorBoard()
+        print(self.board)
         
+        
+        if position is None:
+            
+            if self.board.get_piece_arr()[row][col] == None:
+                return
+            if self.board.get_piece_arr()[row][col].color != self.board.active_color:
+                return
+            
+            piece = self.board.get_piece_arr()[row][col]
+            self.ButtonField[row][col].configure(fg_color=(App.Colors.Moving_Piece, App.Colors.Moving_Piece))
+            correct_moves = piece.correct_moves(self.board.arr, self.board.prev_arr)
+            correct_captures = piece.correct_captures(self.board.arr, self.board.prev_arr)
+            for move in correct_moves:
+                self.ButtonField[move.row][move.col].configure(fg_color=(App.Colors.Field_Correct_Move, App.Colors.Field_Correct_Move))
+            for capture in correct_captures:
+                self.ButtonField[capture.row][capture.col].configure(fg_color=(App.Colors.Field_Correct_Capture, App.Colors.Field_Correct_Capture))
+        else:
+            self.ButtonField[position.row][position.col].configure(image = None)
+            piece = self.board.get_piece_arr()[position.row][position.col]
+            self.board.move_piece(piece, chessEngine.Position(row, col))
+            self.UpdateBoard()
+            str = self.board.get_str_arr()
+            print("****")
+            for i in str:
+                print(*i)
+                
     #####################################################
     #                                                   #
-    #    Р¤СѓРЅРєС†РёСЏ РїРѕРєСЂР°СЃРєРё РґРѕСЃРєРё РІ С†РІРµС‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ    #
+    #    Функция покраски доски в цвета по умолчанию    #
     #                                                   #
     #####################################################
     def RecolorBoard(self):
@@ -422,16 +442,30 @@ class App(customtkinter.CTk):
                 self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_Black, App.Colors.Board_Black))
             else:
                 self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_White, App.Colors.Board_White))
-    
+                
+                
+    def ClearBoard(self):
+        for i, j in itertools.product(range(8), range(8)):
+            if ((i + j) % 2) == 0:
+                self.ButtonField[i][j].configure(image = None)
+            else:
+                self.ButtonField[i][j].configure(image = None)
+                
+                
+    def UpdateBoard(self):
+        self.RecolorBoard()
+        for piece in self.board.pieces:
+            position = piece.position
+            self.ButtonField[position.row][position.col].configure(image = self.pieceImage(piece.name, piece.color))
     ###################################################
     #                                                 #
-    #    Р¤СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‚Р° РїРѕР·РёС†РёРё РІС‹Р±СЂР°РЅРЅРѕР№ С„РёРіСѓСЂС‹    #
+    #    Функция возврата позиции выбранной фигуры    #
     #                                                 #
     ###################################################
     def SelectedField(self):
         position = chessEngine.Position 
         for i, j in itertools.product(range(8), range(8)):
-            if self.ButtonField[i][j].fg_color == (App.Colors.Field_Correct_Move, App.Colors.Field_Correct_Move):
+            if self.ButtonField[i][j].fg_color == (App.Colors.Moving_Piece, App.Colors.Moving_Piece):
                 position.row = i
                 position.col = j
                 return position
@@ -443,7 +477,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 7. РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕРіСЂР°РјРјС‹
+#   Pt. 7. Инициализация программы
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -453,7 +487,7 @@ class App(customtkinter.CTk):
 
 ###########################
 #                         #
-#    Р—Р°РїСѓСЃРє РїСЂРёР»РѕР¶РµРЅРёСЏ    #
+#    Запуск приложения    #
 #                         #
 ###########################
 if __name__ == "__main__":
