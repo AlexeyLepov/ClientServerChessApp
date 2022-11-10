@@ -1,7 +1,7 @@
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 1. Программный модуль инициализации приложения и построения графического интерфейса
+#   Pt. 1. Program module for building application and graphical interface
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -20,7 +20,6 @@ import tkinter.messagebox
 if platform.system == "Windows":
     os.environ['SDL_VIDEODRIVER'] = 'windib'
 
-import chessBoard
 import chessEngine
 
 
@@ -29,7 +28,7 @@ import chessEngine
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 2. Задание исходных параметров окна
+#   Pt. 2. Setting initial window parameters
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -37,48 +36,50 @@ import chessEngine
 
 
 
-##################################################################
-#                                                                #
-#    Основной класс для создания пользовательского окна (GUI)    #
-#                                                                #
-##################################################################
+#######################################################
+#                                                     #
+#    Main class for creating a custom window (GUI)    #
+#                                                     #
+#######################################################
 class App(customtkinter.CTk):
     
-    ##################################################################
-    #                                                                #
-    #    Задание входных параметров и класса для работы с цветами    #
-    #                                                                #
-    ##################################################################
-    WIDTH = 1160                            # Задание ширины окна приложения
-    HEIGHT = 680                            # Задание высоты окна приложения
-    DIMENSION = 8                           # the dimensions of the chess board
+    ######################################################################
+    #                                                                    #
+    #    Setting the parameters and the class for working with colors    #
+    #                                                                    #
+    ######################################################################
+    WIDTH = 1160                            # Setting the Application Window Width
+    HEIGHT = 680                            # Setting the Application Window height
+    DIMENSION = 8                           # dimensions count of the chess board
     B_WIDTH = B_HEIGHT = 560                # width and height of the chess board
     SQ_SIZE = B_HEIGHT // DIMENSION         # the size of each of the sWPquares in the board
-    PIECE_DIR = "Assets/PiecesModern/"      # Стандартная папка для изображений фигур
+    PIECE_DIR = "Assets/PiecesModern/"      # Standard piece Image Folder
     
-    board = None
-    # класс для работы с цветами
-    class Colors:
-        Board_White = "#f9dcc4" # Стандартный цвет для белых полей доски
-        Board_Black = "#023047" # Standart color for black chessboard fields (для черных)
-        Field_Correct_Move = "#a7c957" # Цвет для полей, в которые может ходить фигура
-        Field_Correct_Capture = "#f28482" # Цвет полей, в которых стоит вражеская фигура
-        Moving_Piece = "#ff00ff" # Цвет перемещаемой фигуры
-        Users_Current = chessEngine.Color.WHITE # Цвет игрока
-    
-    ###################################################
-    #                                                 #
-    #    Инициализация класса при создании объекта    #
-    #                                                 #
-    ###################################################
-    def __init__(self):
-        super().__init__()  # Определение родительского класса
+    # virtual board
+    board = None    
 
-        # Задание исходных параметров окна
-        customtkinter.set_appearance_mode("dark")       # изменение темы НА ТЕМНУЮ
-        customtkinter.set_default_color_theme("dark-blue")   # изменение темы (ЦВЕТОВАЯ ПАЛИТРА)
+    # color class
+    class Colors:
+        Board_White = "#f9dcc4"                 # Standard color for white board margins
+        Board_Black = "#023047"                 # Standart color for black chessboard fields (for black ones)
+        Field_Correct_Move = "#a7c957"          # Color for fields that a piece can move to
+        Field_Correct_Capture = "#f28482"       # The color of the fields in which the enemy piece stands
+        Moving_Piece = "#87a937"                # the color of the selected piece
+        Users_Current = chessEngine.Color.WHITE # Player Color
+    
+    ################################################
+    #                                              #
+    #    Class initialization - object creation    #
+    #                                              #
+    ################################################
+    def __init__(self):
+        super().__init__()  # Parent class definition
+
+        # Setting initial window settings
+        customtkinter.set_appearance_mode("dark") # change theme to DARK
+        customtkinter.set_default_color_theme("dark-blue") # theme change (COLOR PALETTE)
         self.resizable(False, False)
-        self.title("Игра в Шахматы")
+        self.title("РРіСЂР° РІ РЁР°С…РјР°С‚С‹")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         # self.minsize(App.WIDTH, App.HEIGHT)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -87,7 +88,7 @@ class App(customtkinter.CTk):
             self.bind("<Command-w>", self.on_closing)
             self.createcommand('tk::mac::Quit', self.on_closing)
         
-        # Считывание изображение фигур и "подгонка" по размеру одной клетки виртуальной шахматной доски
+        # Reading the image of pieces and "fitting" to the size of one cell of the virtual chessboard
         self.BB = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bB.png')).subsample(App.DIMENSION, App.DIMENSION)
         self.BP = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bp.png')).subsample(App.DIMENSION, App.DIMENSION)
         self.BN = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'bN.png')).subsample(App.DIMENSION, App.DIMENSION)
@@ -101,20 +102,13 @@ class App(customtkinter.CTk):
         self.WQ = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wQ.png')).subsample(App.DIMENSION, App.DIMENSION)
         self.WK = tkinter.PhotoImage(file = os.path.join(App.PIECE_DIR, 'wK.png')).subsample(App.DIMENSION, App.DIMENSION)
 
-        ################################################
-        #                                              #
-        #    Класс для работы с изображениями фигур    #
-        #                                              #
-        ################################################
-
-
 
 
 
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 3. Создание панелей (фреймов)
+#   Pt. 3. Creation of panels (frames)
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -122,15 +116,15 @@ class App(customtkinter.CTk):
 
 
 
-        #################################################
-        #                                               #
-        #    Создание родительских панелей (фреймов)    #
-        #                                               #
-        #################################################
-        # Настройка макета сетки (1x2)
+        #########################################
+        #                                       #
+        #    Creating parent panels (frames)    #
+        #                                       #
+        #########################################
+        # Grid layout setting (1x2)
         self.grid_columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-        # Создание окон (1x2)
+        # Creating windows (1x2)
         self.frame_menu = customtkinter.CTkFrame(master=self, width=140, corner_radius=0)
         self.frame_menu.grid(row=0, column=0, sticky="nswe")
         self.frame_playClient = customtkinter.CTkFrame(master=self)
@@ -140,62 +134,62 @@ class App(customtkinter.CTk):
         self.frame_info = customtkinter.CTkFrame(master=self)
         self.frame_info.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         
-        ########################################
-        #                                      #
-        #    Создание боковой панели (МЕНЮ)    #
-        #                                      #
-        ########################################
-        # Настройка макета сетки
+        ###################################
+        #                                 #
+        #    Creating a sidebar (MENU)    #
+        #                                 #
+        ###################################
+        # Setting the Grid Layout
         self.frame_menu.grid_rowconfigure(6, weight=1)
         self.frame_menu.grid_rowconfigure(11, minsize=10)
-        self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="МЕНЮ", text_font=("Roboto Medium", -16))
+        self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="РњР•РќР®", text_font=("Roboto Medium", -16))
         self.label_menu.grid(row=0, column=0, pady=10, padx=10)
-        # Кнопки
-        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Играть\nс клиентом", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playClient_event)
+        # Buttons
+        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="РРіСЂР°С‚СЊ\nСЃ РёРіСЂРѕРєРѕРј", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playClient_event)
         self.button_playClient.grid(row=1, column=0, pady=10, padx=10)
-        self.button_playBot = customtkinter.CTkButton(master=self.frame_menu, text="Играть\nс ботом", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playBot_event)
+        self.button_playBot = customtkinter.CTkButton(master=self.frame_menu, text="РРіСЂР°С‚СЊ\nСЃ Р±РѕС‚РѕРј", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playBot_event)
         self.button_playBot.grid(row=2, column=0, pady=10, padx=10)
-        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
+        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="Рћ РїСЂРѕРіСЂР°РјРјРµ", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
         self.button_info.grid(row=3, column=0, pady=10, padx=10)
-        # Переключатель темной темы
-        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_mode)
+        # Dark theme switcher
+        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="РўРµРјРЅР°СЏ С‚РµРјР°", command=self.change_mode)
         self.switch_dark_theme.grid(row=10, column=0, pady=10, padx=10, sticky="w")
 
-        #################################################
-        #                                               #
-        #    Создание окна с информацией о программе    #
-        #                                               #
-        #################################################
-        # Настройка макета сетки
+        ##############################################################
+        #                                                            #
+        #    Creating a window with information about the program    #
+        #                                                            #
+        ##############################################################
+        # Setting the Grid Layout
         self.frame_info.rowconfigure(14, weight=10)
         self.frame_info.columnconfigure(0, weight=1)
 
-        self.label_info = customtkinter.CTkLabel(master=self.frame_info, text="Информация о программе",
+        self.label_info = customtkinter.CTkLabel(master=self.frame_info, text="РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїСЂРѕРіСЂР°РјРјРµ",
                                                  text_font=("Roboto Medium", -16))
         self.label_info.grid(row=0, column=0, pady=10, padx=10)
 
         self.label_info_info = customtkinter.CTkLabel(master=self.frame_info, height=100,
                                                       text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
                                                       justify=tkinter.LEFT,
-                                                      text=" \nРеализация клиент-серверной программной системы \"Игра в Шахматы\". \n")
+                                                      text=" \nР РµР°Р»РёР·Р°С†РёСЏ РєР»РёРµРЅС‚-СЃРµСЂРІРµСЂРЅРѕР№ РїСЂРѕРіСЂР°РјРјРЅРѕР№ СЃРёСЃС‚РµРјС‹ \"РРіСЂР° РІ РЁР°С…РјР°С‚С‹\". \n")
         self.label_info_info.grid(row=1, column=0, sticky="we", padx=10, pady=10)
 
         self.label_info_authors = customtkinter.CTkLabel(master=self.frame_info, height=200,
                                                          text_font=("Roboto Medium", -16), fg_color=("white", "gray38"),
                                                          justify=tkinter.LEFT,
-                                                         text="\nРазработкой занимались студенты СПбГЭТУ (ЛЭТИ), гр. 1308:\n\n" +
-                                                              "Томилов Даниил" + "; \n" +
-                                                              "Макаров Максим" + "; \n" +
-                                                              "Мельник Даниил" + "; \n" +
-                                                              "Лепов Алексей" + ". \n")
+                                                         text="\n\nР Р°Р·СЂР°Р±РѕС‚РєРѕР№ Р·Р°РЅРёРјР°Р»РёСЃСЊ СЃС‚СѓРґРµРЅС‚С‹ РЎРџР±Р“Р­РўРЈ (Р›Р­РўР), РіСЂ. 1308:\n\n" +
+                                                              "Р›РµРїРѕРІ РђР»РµРєСЃРµР№" + ". \n" +
+                                                              "РўРѕРјРёР»РѕРІ Р”Р°РЅРёРёР»" + "; \n" +
+                                                              "РњРµР»СЊРЅРёРє Р”Р°РЅРёРёР»" + "; \n" +
+                                                              "РњР°РєР°СЂРѕРІ РњР°РєСЃРёРј" + "; \n")
         self.label_info_authors.grid(row=2, column=0, sticky="we", padx=10, pady=10)
 
-        ####################################################
-        #                                                  #
-        #    Создание окна для игр в шахматы с клиентом    #
-        #                                                  #
-        ####################################################
-        # Настройка макета сетки
+        ###########################################################
+        #                                                         #
+        #    Creating a window for playing chess with a client    #
+        #                                                         #
+        ###########################################################
+        # Setting the Grid Layout
         self.frame_playClient.rowconfigure(14, weight=10)
         self.frame_playClient.columnconfigure(0, weight=1)
         
@@ -214,11 +208,11 @@ class App(customtkinter.CTk):
         self.frame_bottom_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, fg_color=("#C0C2C5","#343638"))
         self.frame_bottom_timeClient.grid(row=2, column=0, sticky="nswe", padx=5, pady=5)
     
-        ###################################################
-        #                                                 #
-        #    Создание окна для игр в шахматы с роботом    #
-        #                                                 #
-        ###################################################
+        ##########################################################
+        #                                                        #
+        #    Creating a window for playing chess with a robot    #
+        #                                                        #
+        ##########################################################
         ...
         ...
         ...
@@ -229,7 +223,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 4. Задание входных параметров постинициализации
+#   Pt. 4. Setting post-initialization input parameters
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -239,7 +233,7 @@ class App(customtkinter.CTk):
 
         ##########################################
         #                                        #
-        #    Вывод на экран начальной позиции    #
+        #    Displaying the starting position    #
         #                                        #
         ##########################################
         self.ButtonField = [[0 for _ in range(8)] for _ in range(8)]
@@ -256,11 +250,11 @@ class App(customtkinter.CTk):
         for i, j in itertools.product(range(8), range(8)):
             self.ButtonField[i][j].command = lambda row=i,col=j: self.ButtonField_event(row,col)
 
-        ##########################################
-        #                                        #
-        #    Присвение значений по умолчанию     #
-        #                                        #
-        ##########################################
+        ##################################
+        #                                #
+        #    Assigning Default Values    #
+        #                                #
+        ##################################
         self.hide_menu_frames()
         self.frame_playClient.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         self.switch_dark_theme.select()
@@ -275,12 +269,19 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 5. Функции для работы с окнами и панелями (frames)
+#   Pt. 5. Functions for working with windows and panels (frames)
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 
 
+
+
+    #####################################
+    #                                   #
+    #    Piece image return function    #
+    #                                   #
+    #####################################
     def pieceImage(self, name, color):
         if color == chessEngine.Color.WHITE:
             if name == "pawn":
@@ -315,11 +316,11 @@ class App(customtkinter.CTk):
         else:
             raise ValueError("Invalid color")
 
-    ###################################################
-    #                                                 #
-    #    Функции для вызова окон и других функций     #
-    #                                                 #
-    ###################################################
+    ###########################################################
+    #                                                         #
+    #    Functions for calling windows and other functions    #
+    #                                                         #
+    ###########################################################
     def hide_menu_frames(self):
         self.frame_info.grid_forget()
         self.frame_playBot.grid_forget()
@@ -328,11 +329,11 @@ class App(customtkinter.CTk):
         self.button_playBot.configure(fg_color=("gray75", "gray30"))
         self.button_playClient.configure(fg_color=("gray75", "gray30"))
 
-    ##################################################
-    #                                                #
-    #    Функции для управления параметрами окон     #
-    #                                                #
-    ##################################################
+    ################################################
+    #                                              #
+    #    Functions for managing window settings    #
+    #                                              #
+    ################################################
     def button_info_event(self):
         self.hide_menu_frames()
         self.frame_info.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
@@ -357,22 +358,22 @@ class App(customtkinter.CTk):
         else:
             self.button_playClient.configure(fg_color=("#7db8d4"))
 
-    ################################
-    #                              #
-    #    Функция для смены темы    #
-    #                              #
-    ################################
+    ###############################
+    #                             #
+    #    theme change function    #
+    #                             #
+    ###############################
     def change_mode(self):
         if self.switch_dark_theme.get() == 1:
             customtkinter.set_appearance_mode("Dark")
         else:
             customtkinter.set_appearance_mode("Light")
 
-    #################################################################
-    #                                                               #
-    #    Системные функции для вызова и закрытия окна приложения    #
-    #                                                               #
-    #################################################################
+    #########################################################
+    #                                                       #
+    #    cleaning the window and exiting the application    #
+    #                                                       #
+    #########################################################
     def on_closing(self, event=0):
         self.destroy()
 
@@ -385,7 +386,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 6. Функции для работы с фигурами
+#   Pt. 6. Functions for moving pieces
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -393,26 +394,22 @@ class App(customtkinter.CTk):
 
 
 
-    ######################################################
-    #                                                    #
-    #    Функции для нажатия кнопок - шахматных полей    #
-    #                                                    #
-    ######################################################
+    #######################################################
+    #                                                     #
+    #    Functions for pressing buttons - chess fields    #
+    #                                                     #
+    #######################################################
     def ButtonField_event(self,row,col):
-        # correct_moves - список ходов, которыми может оперировать фигура - кроме тех, в которых можно захватить врага
-        # correct_captures - список всех возможных захватов вржеских фигур
-        # move_piece - осуществить движение фигуры
+        # correct_moves - list of moves that a piece can operate on - except for those in which it is possible to capture the enemy
+        # correct_captures - list of all possible captures of enemy pieces
+        # move_piece - piece moving
         position = self.SelectedField()
         print(self.board)
-        
-        
         if position is None:
-            
-            if self.board.get_piece_arr()[row][col] == None:
+            if self.board.get_piece_arr()[row][col] is None:
                 return
             if self.board.get_piece_arr()[row][col].color != self.board.active_color:
                 return
-            
             piece = self.board.get_piece_arr()[row][col]
             self.ButtonField[row][col].configure(fg_color=(App.Colors.Moving_Piece, App.Colors.Moving_Piece))
             correct_moves = piece.correct_moves(self.board.arr, self.board.prev_arr)
@@ -427,15 +424,15 @@ class App(customtkinter.CTk):
             self.board.move_piece(piece, chessEngine.Position(row, col))
             self.UpdateBoard()
             str = self.board.get_str_arr()
-            print("****")
+            print("_"*32+"\n")
             for i in str:
                 print(*i)
                 
-    #####################################################
-    #                                                   #
-    #    Функция покраски доски в цвета по умолчанию    #
-    #                                                   #
-    #####################################################
+    #######################################################
+    #                                                     #
+    #    Function to paint the board in default colors    #
+    #                                                     #
+    #######################################################
     def RecolorBoard(self):
         for i, j in itertools.product(range(8), range(8)):
             if ((i + j) % 2) == 0:
@@ -446,10 +443,7 @@ class App(customtkinter.CTk):
                 
     def ClearBoard(self):
         for i, j in itertools.product(range(8), range(8)):
-            if ((i + j) % 2) == 0:
-                self.ButtonField[i][j].configure(image = None)
-            else:
-                self.ButtonField[i][j].configure(image = None)
+            self.ButtonField[i][j].configure(image = None)
                 
                 
     def UpdateBoard(self):
@@ -457,11 +451,12 @@ class App(customtkinter.CTk):
         for piece in self.board.pieces:
             position = piece.position
             self.ButtonField[position.row][position.col].configure(image = self.pieceImage(piece.name, piece.color))
-    ###################################################
-    #                                                 #
-    #    Функция возврата позиции выбранной фигуры    #
-    #                                                 #
-    ###################################################
+    
+    ###############################################################
+    #                                                             #
+    #    Function to return null if no shape has been selected    #
+    #                                                             #
+    ###############################################################
     def SelectedField(self):
         position = chessEngine.Position 
         for i, j in itertools.product(range(8), range(8)):
@@ -477,7 +472,7 @@ class App(customtkinter.CTk):
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
 # 
-#   Pt. 7. Инициализация программы
+#   Pt. 7. Program initialization
 #
 ##################################################################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################################################################
@@ -485,11 +480,11 @@ class App(customtkinter.CTk):
 
 
 
-###########################
-#                         #
-#    Запуск приложения    #
-#                         #
-###########################
+############################
+#                          #
+#    Application launch    #
+#                          #
+############################
 if __name__ == "__main__":
     app = App()
     app.start()
