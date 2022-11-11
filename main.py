@@ -404,7 +404,7 @@ class App(customtkinter.CTk):
         # correct_captures - list of all possible captures of enemy pieces
         # move_piece - piece moving
         position = self.SelectedField()
-        print(self.board)
+        #print(self.board)
         if position is None:
             if self.board.get_piece_arr()[row][col] is None:
                 return
@@ -424,9 +424,9 @@ class App(customtkinter.CTk):
             self.board.move_piece(piece, chessEngine.Position(row, col))
             self.UpdateBoard()
             str = self.board.get_str_arr()
-            print("_"*32+"\n")
-            for i in str:
-                print(*i)
+            #print("_"*32+"\n")
+            #for i in str:
+                #print(*i)
                 
     #######################################################
     #                                                     #

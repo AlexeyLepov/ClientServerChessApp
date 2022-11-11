@@ -11,7 +11,44 @@
 from enum import Enum
 import copy
 
+class WhiteCheck(Exception):
+    def __init__(self, message):
+        self.message = message
+    
+    def __str__(self):
+        if self.message:
+            return "WhiteCheck: " + self.message
+        else:
+            return "WhiteCheck"
+    
+class BlackCheck(Exception):
+    def __init__(self, message):
+        self.message = message
+    
+    def __str__(self):
+        if self.message:
+            return "BlackCheck: " + self.message
+        else:
+            return "BlackCheck"
 
+class WhiteMate(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        if self.message:
+            return "WhiteMate: " + self.message
+        else:
+            return "WhiteMate"
+
+class BlackMate(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        if self.message:
+            return "BlackMate: " + self.message
+        else:
+            return "BlackMate"
+        
 class Color(Enum):
     WHITE = 1
     BLACK = 2
@@ -141,7 +178,7 @@ class Piece:
 
         if self.name == "bishop" or self.name == "queen":
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row + i <= 7 and self.position.col + i <= 7:
                     if board_arr[self.position.row + i][self.position.col + i] == None:
                         moves.append(
@@ -151,7 +188,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row + i <= 7 and self.position.col - i >= 0:
                     if board_arr[self.position.row + i][self.position.col - i] == None:
                         moves.append(
@@ -161,7 +198,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row - i >= 0 and self.position.col + i <= 7:
                     if board_arr[self.position.row - i][self.position.col + i] == None:
                         moves.append(
@@ -171,7 +208,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row - i >= 0 and self.position.col - i >= 0:
                     if board_arr[self.position.row - i][self.position.col - i] == None:
                         moves.append(
@@ -277,10 +314,13 @@ class Piece:
                         break
                 else:
                     break
-        for move in captures:
-            if board_arr[move.row][move.col].color == self.color:
-                captures.remove(move)
-        return captures
+        new_captures = []
+        for move in captures: 
+            print(move)
+            print(board_arr)
+            if board_arr[move.row][move.col].color != self.color:
+                new_captures.append(move)
+        return new_captures
 
     @classmethod
     def get_value(cls, name):
@@ -371,7 +411,7 @@ class Board:
         for piece in pieces_list:
             for pos in Piece.get_start_position(piece[0], piece[1]):
                 pieces.append(Piece(piece[1], piece[0], Piece.get_value(piece[0]), pos))
-        print(len(pieces))
+        #print(len(pieces))
 
         return pieces
 
@@ -438,7 +478,7 @@ class Board:
     def move_piece(self, piece, new_pos):
         corr_moves = Piece.correct_moves(piece, self.arr, self.prev_arr)
         corr_captures = Piece.correct_captures(piece, self.arr, self.prev_arr)
-        print(corr_moves)
+        #print(corr_moves)
         if piece.color != self.active_color:
             return False
         if new_pos in corr_moves:
