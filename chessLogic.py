@@ -1,4 +1,5 @@
-from chessEngine import Board
+from chessEngine import Board, Position
+import copy
 
 
 class Node:
@@ -9,6 +10,8 @@ class Node:
         self.board: Board = None
         self.is_white: bool = is_white
         self.moves: list = []
+        self.children: list = []
+        self.evaluation: float = 0
 
     def get_static_evaluation(self):
         """
@@ -70,16 +73,132 @@ class Node:
         return evaluation
 
     def alpha_beta_evaluation(self, depth, alpha, beta, is_white_player):
+        interesting = self.board.interesting_moves()
+
+        # arr = self.board.get_str_arr()
+        # print(depth, self.is_white, interesting)
+        # for n, i in enumerate(arr):
+        #     print(8 - n, *i)
+        # print("  a  b  c  d  e  f  g  h")
+
+        if depth <= 0:
+
+
+            if len(interesting) == 0 or depth <= -6:
+                ret = self.get_static_evaluation()
+                del self.board
+                self.board = None
+                return ret
+            else:
+                if is_white_player:
+                    max_evaluation: float = - 10 ** 9
+                    for move in interesting:
+                        b: Board = copy.deepcopy(self.board)
+                        b.move_piece(b.arr[int(move[0][0])][int(move[0][1])],
+                                     Position(int(move[1][0]), int(move[1][1])))
+                        n: Node = Node(b.get_FEN(), not self.is_white)
+                        n.board = b
+                        b = None
+                        self.children.append(n)
+                        self.evaluation: float = n.alpha_beta_evaluation(depth - 1, alpha, beta, not is_white_player)
+                        max_evaluation = max(max_evaluation, self.evaluation)
+                        alpha = max(alpha, self.evaluation)
+                        if beta <= alpha:
+                            print("pruned a in q")
+                            break
+                    del self.board
+                    self.board = None
+                    return max_evaluation
+                else:
+                    min_evaluation: float = 10 ** 9
+                    for move in interesting:
+                        b: Board = copy.deepcopy(self.board)
+                        b.move_piece(b.arr[move[0][0]][move[0][1]], Position(move[1][0], move[1][1]))
+                        n: Node = Node(b.get_FEN(), not self.is_white)
+                        n.board = b
+                        b = None
+                        self.children.append(n)
+                        self.evaluation: float = n.alpha_beta_evaluation(depth - 1, alpha, beta, not is_white_player)
+                        min_evaluation = min(min_evaluation, self.evaluation)
+                        beta = min(beta, min_evaluation)
+                        if beta <= alpha:
+                            print("pruned b in q")
+                            break
+                    del self.board
+                    self.board = None
+                    return min_evaluation
+
+
+
         self.moves = self.board.all_moves()
-        if depth == 0:
-            return self.get_static_evaluation()
-        elif is_white_player:
-            max_evaluation = - 10**9
+        if is_white_player:
+            max_evaluation: float = - 10 ** 9
             for move in self.moves:
-                pass
+                b: Board = copy.deepcopy(self.board)
+                b.move_piece(b.arr[int(move[0][0])][int(move[0][1])], Position(int(move[1][0]), int(move[1][1])))
+                n: Node = Node(b.get_FEN(), not self.is_white)
+                n.board = b
+                b = None
+                self.children.append(n)
+                self.evaluation: float = n.alpha_beta_evaluation(depth - 1, alpha, beta, not is_white_player)
+                max_evaluation = max(max_evaluation, self.evaluation)
+                alpha = max(alpha, self.evaluation)
+                if beta <= alpha:
+                    print("pruned a")
+                    break
+            del self.board
+            self.board = None
+            return max_evaluation
+        else:
+            min_evaluation: float = 10 ** 9
+            for move in self.moves:
+                b: Board = copy.deepcopy(self.board)
+                b.move_piece(b.arr[move[0][0]][move[0][1]], Position(move[1][0], move[1][1]))
+                n: Node = Node(b.get_FEN(), not self.is_white)
+                n.board = b
+                b = None
+                self.children.append(n)
+                self.evaluation: float = n.alpha_beta_evaluation(depth - 1, alpha, beta, not is_white_player)
+                min_evaluation = min(min_evaluation, self.evaluation)
+                beta = min(beta, min_evaluation)
+                if beta <= alpha:
+                    print("pruned b")
+                    break
+            del self.board
+            self.board = None
+            return min_evaluation
 
 
 class GameTree:
     def __init__(self, fen_notation, is_white):
-        self.root = Node(fen_notation, is_white)
-        evaluation = 0
+        self.root: Node = Node(fen_notation, is_white)
+        if is_white:
+            self.evaluation: float = -10 ** 9
+        else:
+            self.evaluation: float = 10 ** 9
+        self.is_white = is_white
+
+    def alpha_beta_evaluation(self, depth):
+        self.root.board = Board.from_FEN(self.root.fen)
+        self.evaluation = self.root.alpha_beta_evaluation(depth, -10 ** 9, 10 ** 9, self.root.is_white)
+        return self.evaluation
+
+    def suggest_move(self, depth=None):
+        move = None
+        child = None
+        if self.is_white:
+            self.evaluation = -10 ** 9
+        else:
+            self.evaluation = 10 ** 9
+        for i in range(len(self.root.children)):
+            if self.is_white:
+                if self.root.children[i].evaluation > self.evaluation:
+                    self.evaluation = self.root.children[i].evaluation
+                    move = self.root.moves[i]
+                    child = self.root.children[i]
+            else:
+                if self.root.children[i].evaluation < self.evaluation:
+                    self.evaluation = self.root.children[i].evaluation
+                    move = self.root.moves[i]
+                    child = self.root.children[i]
+        return move, child
