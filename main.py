@@ -16,6 +16,7 @@ import platform
 import itertools
 import customtkinter
 import tkinter.messagebox
+import chessLogic
 
 if platform.system == "Windows":
     os.environ['SDL_VIDEODRIVER'] = 'windib'

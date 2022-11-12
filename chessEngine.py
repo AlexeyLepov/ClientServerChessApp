@@ -10,6 +10,7 @@
 
 from enum import Enum
 import copy
+import chessLogic
 
 class WhiteCheck(Exception):
     def __init__(self, message):
@@ -557,6 +558,18 @@ class Board:
 
         return " ".join(FEN_arr)
 
+    def all_moves(self):
+        array = []
+        piece_array = self.get_piece_arr()
+        for piece in self.pieces:
+            moves = piece.correct_moves(piece_array,None)
+            for move in moves:
+                if self.active_color == Color.WHITE and piece.color == Color.WHITE:
+                    array.append(str(piece.position) +" "+str(move))
+                if self.active_color == Color.BLACK and piece.color == Color.BLACK:
+                    array.append([[piece.position.row,piece.position.col], [move.row,move.col]])
+        return array
+
 
 def main():
     board = Board.from_FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1")
@@ -571,6 +584,7 @@ def main():
     print("  a  b  c  d  e  f  g  h")
     while True:
         print(board.get_FEN())
+        print(board.all_moves())
         move = input("your move: ").split()
         if move[0] == "exit":
             break
