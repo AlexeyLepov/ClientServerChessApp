@@ -10,8 +10,46 @@
 
 from enum import Enum
 import copy
+import chessLogic
 
+class WhiteCheck(Exception):
+    def __init__(self, message):
+        self.message = message
+    
+    def __str__(self):
+        if self.message:
+            return "WhiteCheck: " + self.message
+        else:
+            return "WhiteCheck"
+    
+class BlackCheck(Exception):
+    def __init__(self, message):
+        self.message = message
+    
+    def __str__(self):
+        if self.message:
+            return "BlackCheck: " + self.message
+        else:
+            return "BlackCheck"
 
+class WhiteMate(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        if self.message:
+            return "WhiteMate: " + self.message
+        else:
+            return "WhiteMate"
+
+class BlackMate(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        if self.message:
+            return "BlackMate: " + self.message
+        else:
+            return "BlackMate"
+        
 class Color(Enum):
     WHITE = 1
     BLACK = 2
@@ -141,7 +179,7 @@ class Piece:
 
         if self.name == "bishop" or self.name == "queen":
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row + i <= 7 and self.position.col + i <= 7:
                     if board_arr[self.position.row + i][self.position.col + i] == None:
                         moves.append(
@@ -151,7 +189,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row + i <= 7 and self.position.col - i >= 0:
                     if board_arr[self.position.row + i][self.position.col - i] == None:
                         moves.append(
@@ -161,7 +199,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row - i >= 0 and self.position.col + i <= 7:
                     if board_arr[self.position.row - i][self.position.col + i] == None:
                         moves.append(
@@ -171,7 +209,7 @@ class Piece:
                 else:
                     break
             for i in range(1, 9):
-                print(i)
+                #print(i)
                 if self.position.row - i >= 0 and self.position.col - i >= 0:
                     if board_arr[self.position.row - i][self.position.col - i] == None:
                         moves.append(
@@ -277,10 +315,13 @@ class Piece:
                         break
                 else:
                     break
-        for move in captures:
-            if board_arr[move.row][move.col].color == self.color:
-                captures.remove(move)
-        return captures
+        new_captures = []
+        for move in captures: 
+            #print(move)
+            #print(board_arr)
+            if board_arr[move.row][move.col].color != self.color:
+                new_captures.append(move)
+        return new_captures
 
     @classmethod
     def get_value(cls, name):
@@ -371,7 +412,7 @@ class Board:
         for piece in pieces_list:
             for pos in Piece.get_start_position(piece[0], piece[1]):
                 pieces.append(Piece(piece[1], piece[0], Piece.get_value(piece[0]), pos))
-        print(len(pieces))
+        #print(len(pieces))
 
         return pieces
 
@@ -438,7 +479,7 @@ class Board:
     def move_piece(self, piece, new_pos):
         corr_moves = Piece.correct_moves(piece, self.arr, self.prev_arr)
         corr_captures = Piece.correct_captures(piece, self.arr, self.prev_arr)
-        print(corr_moves)
+        #print(corr_moves)
         if piece.color != self.active_color:
             return False
         if new_pos in corr_moves:
@@ -517,9 +558,49 @@ class Board:
 
         return " ".join(FEN_arr)
 
+    def all_moves(self):
+        capture_arr = []
+        non_capture_arr = []
+        array = []
+        piece_array = self.get_piece_arr()
+        for piece in self.pieces:
+            moves = piece.correct_moves(piece_array,None)
+            captures = piece.correct_captures(piece_array,None)
+            # for move in moves:
+            #     for capt in captures:
+            #         if
+            for move in captures:
+                if self.active_color == Color.WHITE and piece.color == Color.WHITE:
+                    capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])
+                if self.active_color == Color.BLACK and piece.color == Color.BLACK:
+                    capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])
+            for move in moves:
+                if self.active_color == Color.WHITE and piece.color == Color.WHITE:
+                    non_capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])
+                if self.active_color == Color.BLACK and piece.color == Color.BLACK:
+                    non_capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])
+        array = capture_arr+non_capture_arr
+        return array
+
+    def interesting_moves(self):
+        capture_arr = []
+        piece_array = self.get_piece_arr()
+        for piece in self.pieces:
+            captures = piece.correct_captures(piece_array, None)
+            for move in captures:
+                if self.active_color == Color.WHITE and piece.color == Color.WHITE:
+                    capture_arr.append([[piece.position.row, piece.position.col], [move.row, move.col]])
+                if self.active_color == Color.BLACK and piece.color == Color.BLACK:
+                    capture_arr.append([[piece.position.row, piece.position.col], [move.row, move.col]])
+        return capture_arr
+
 
 def main():
-    board = Board.from_FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1")
+    board = Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq e3 0 1")
+    #board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
+    #board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("1n2kbnr/8/8/8/2PKPPbP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("1n2kbnr/8/8/8/2PPPPbP/8/8/8 b KQkq e3 0 1")
     arr = board.get_str_arr()
     print(arr)
     print(board.get_FEN())
@@ -531,14 +612,32 @@ def main():
     print("  a  b  c  d  e  f  g  h")
     while True:
         print(board.get_FEN())
-        move = input("your move: ").split()
-        if move[0] == "exit":
-            break
-        first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
-        last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
-        print(first_pos, last_pos)
-        print(board.arr[first_pos.row][first_pos.col].position)
-        print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
+        print(board.all_moves())
+        if board.active_color == Color.WHITE:
+
+            move = input("your move: ").split()
+            if move[0] == "exit":
+                break
+            first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
+            last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
+            print(first_pos, last_pos)
+            print(board.arr[first_pos.row][first_pos.col].position)
+            print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
+        else:
+            game_tree = chessLogic.GameTree(board.get_FEN(),False)
+            game_tree.alpha_beta_evaluation(2)
+            move,_ = game_tree.suggest_move()
+            print("-----------------------------------------------------")
+            print(_.board)
+            print(move)
+            for i in game_tree.root.children:
+                print(i.evaluation)
+            print("-----------------------------------------------------")
+            # first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
+            # last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
+            # print(first_pos, last_pos)
+            # print(board.arr[first_pos.row][first_pos.col].position)
+            print(board.move_piece(board.arr[move[0][0]][move[0][1]], Position(move[1][0],move[1][1])))
         arr = board.get_str_arr()
         print(f"color: {board.active_color}, W: {board.score[Color.WHITE]}, B: {board.score[Color.BLACK]}")
         for n, i in enumerate(arr):
