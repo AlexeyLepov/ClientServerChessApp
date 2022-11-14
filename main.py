@@ -75,6 +75,10 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()  # Parent class definition
 
+        popup = customtkinter.CTk() # building popup window
+        popup.geometry("100x20")
+        
+        
         # Setting initial window settings
         customtkinter.set_appearance_mode("dark") # change theme to DARK
         customtkinter.set_default_color_theme("dark-blue") # theme change (COLOR PALETTE)
@@ -152,7 +156,7 @@ class App(customtkinter.CTk):
         self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
         self.button_info.grid(row=3, column=0, pady=10, padx=10)
         # Dark theme switcher
-        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_mode)
+        self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_theme_mode)
         self.switch_dark_theme.grid(row=10, column=0, pady=10, padx=10, sticky="w")
 
         ##############################################################
@@ -363,7 +367,7 @@ class App(customtkinter.CTk):
     #    theme change function    #
     #                             #
     ###############################
-    def change_mode(self):
+    def change_theme_mode(self):
         if self.switch_dark_theme.get() == 1:
             customtkinter.set_appearance_mode("Dark")
         else:
@@ -379,6 +383,14 @@ class App(customtkinter.CTk):
 
     def start(self):
         self.mainloop()
+        
+    #######################
+    #                     #
+    #    popup windows    #
+    #                     #
+    #######################
+    def popup_promote_pown():
+        ...
    
    
    
@@ -488,4 +500,4 @@ class App(customtkinter.CTk):
 if __name__ == "__main__":
     app = App()
     app.start()
-    
+        
