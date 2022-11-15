@@ -1,3 +1,4 @@
+import chessEngine
 from chessEngine import Board, Position
 import copy
 
@@ -37,6 +38,7 @@ class Node:
         king_advantage = 0
         c1_6 = 300
         board_array = self.board.get_str_arr()
+        piece_arr = self.board.get_piece_arr()
         for line in board_array:
             for tile in line:
                 if tile == "WR":
@@ -63,6 +65,64 @@ class Node:
                     king_advantage += 1
                 elif tile == "BK":
                     king_advantage -= 1
+        c2_1 = 0.01
+        rook_mobility_advantage = 0
+        for piece in self.board.pieces:
+            if piece.name == "rook":
+                if piece.color == chessEngine.Color.WHITE:
+                    for move in piece.correct_moves(piece_arr,None):
+                        rook_mobility_advantage+=1
+                    for move in piece.correct_captures(piece_arr,None):
+                        rook_mobility_advantage+=1
+                else:
+                    for move in piece.correct_moves(piece_arr, None):
+                        rook_mobility_advantage -= 1
+                    for move in piece.correct_captures(piece_arr,None):
+                        rook_mobility_advantage-=1
+
+        c2_2 = 0.02
+        bishop_mobility_advantage = 0
+        for piece in self.board.pieces:
+            if piece.name == "bishop":
+                if piece.color == chessEngine.Color.WHITE:
+                    for move in piece.correct_moves(piece_arr, None):
+                        bishop_mobility_advantage += 1
+                    for move in piece.correct_captures(piece_arr, None):
+                        bishop_mobility_advantage += 1
+                else:
+                    for move in piece.correct_moves(piece_arr, None):
+                        bishop_mobility_advantage -= 1
+                    for move in piece.correct_captures(piece_arr, None):
+                        bishop_mobility_advantage  -= 1
+
+        c2_3 = 0.03
+        knight_mobility_advantage = 0
+        for piece in self.board.pieces:
+            if piece.name == "knight":
+                if piece.color == chessEngine.Color.WHITE:
+                    for move in piece.correct_moves(piece_arr, None):
+                        knight_mobility_advantage  += 1
+                    for move in piece.correct_captures(piece_arr, None):
+                        knight_mobility_advantage  += 1
+                else:
+                    for move in piece.correct_moves(piece_arr, None):
+                        knight_mobility_advantage  -= 1
+                    for move in piece.correct_captures(piece_arr, None):
+                        knight_mobility_advantage  -= 1
+
+        c2_4 = 0.005
+        queen_mobility_advantage = 0
+        for piece in self.board.pieces:
+            if piece.name == "queen":
+                if piece.color == chessEngine.Color.WHITE:
+                    queen_mobility_advantage += len(piece.correct_moves(piece_arr, None))
+                    for move in piece.correct_captures(piece_arr, None):
+                        queen_mobility_advantage+= 1
+                else:
+                    for move in piece.correct_moves(piece_arr, None):
+                        queen_mobility_advantage -= 1
+                    for move in piece.correct_captures(piece_arr, None):
+                        queen_mobility_advantage -= 1
 
         evaluation += c1_1 * rook_advantage
         evaluation += c1_2 * bishop_advantage
@@ -70,6 +130,10 @@ class Node:
         evaluation += c1_4 * queen_advantage
         evaluation += c1_5 * pawn_advantage
         evaluation += c1_6 * king_advantage
+        evaluation+= c2_1*rook_mobility_advantage
+        evaluation+= c2_2*bishop_mobility_advantage
+        evaluation+=c2_3*knight_mobility_advantage
+        evaluation+= c2_4*queen_mobility_advantage
         return evaluation
 
     def alpha_beta_evaluation(self, depth, alpha, beta, is_white_player):
@@ -104,7 +168,7 @@ class Node:
                         max_evaluation = max(max_evaluation, self.evaluation)
                         alpha = max(alpha, self.evaluation)
                         if beta <= alpha:
-                            print("pruned a in q")
+                            #print("pruned a in q")
                             break
                     del self.board
                     self.board = None
@@ -122,7 +186,7 @@ class Node:
                         min_evaluation = min(min_evaluation, self.evaluation)
                         beta = min(beta, min_evaluation)
                         if beta <= alpha:
-                            print("pruned b in q")
+                            #print("pruned b in q")
                             break
                     del self.board
                     self.board = None
@@ -144,7 +208,7 @@ class Node:
                 max_evaluation = max(max_evaluation, self.evaluation)
                 alpha = max(alpha, self.evaluation)
                 if beta <= alpha:
-                    print("pruned a")
+                    #print("pruned a")
                     break
             del self.board
             self.board = None
@@ -162,7 +226,7 @@ class Node:
                 min_evaluation = min(min_evaluation, self.evaluation)
                 beta = min(beta, min_evaluation)
                 if beta <= alpha:
-                    print("pruned b")
+                    #print("pruned b")
                     break
             del self.board
             self.board = None
