@@ -222,8 +222,7 @@ class Piece:
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (
-                            board_arr[self.position.row + i][self.position.col + j] == None or
-                            board_arr[self.position.row + i][self.position.col + j].color != self.color):
+                            board_arr[self.position.row + i][self.position.col + j] == None):
                         moves.append(
                             Position(self.position.row + i, self.position.col + j))
 
@@ -315,6 +314,15 @@ class Piece:
                         break
                 else:
                     break
+                
+        if self.name == "king":
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (
+                            board_arr[self.position.row + i][self.position.col + j] is not None and
+                            board_arr[self.position.row + i][self.position.col + j].color != self.color):
+                        captures.append(
+                            Position(self.position.row + i, self.position.col + j))
         new_captures = []
         for move in captures: 
             #print(move)
