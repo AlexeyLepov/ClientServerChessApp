@@ -596,11 +596,13 @@ class Board:
 
 
 def main():
-    board = Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq e3 0 1")
+    #board = Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq e3 0 1")
     #board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
     #board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
     #board = Board.from_FEN("1n2kbnr/8/8/8/2PKPPbP/8/8/8 b KQkq e3 0 1")
     #board = Board.from_FEN("1n2kbnr/8/8/8/2PPPPbP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("rnbqkbnr/8/8/8/KKKKKKKK/KKKKKKKK/8/K7 w KQkq e3 0 1")
+    board = Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
     arr = board.get_str_arr()
     print(arr)
     print(board.get_FEN())
@@ -613,7 +615,7 @@ def main():
     while True:
         print(board.get_FEN())
         print(board.all_moves())
-        if board.active_color == Color.WHITE:
+        if board.active_color == Color.BLACK:
 
             move = input("your move: ").split()
             if move[0] == "exit":
@@ -624,14 +626,18 @@ def main():
             print(board.arr[first_pos.row][first_pos.col].position)
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
-            game_tree = chessLogic.GameTree(board.get_FEN(),False)
-            game_tree.alpha_beta_evaluation(2)
+            game_tree = chessLogic.GameTree(board.get_FEN(),True)
+            game_tree.alpha_beta_evaluation(5)
             move,_ = game_tree.suggest_move()
             print("-----------------------------------------------------")
-            print(_.board)
+            #print(_.board)
             print(move)
             for i in game_tree.root.children:
-                print(i.evaluation)
+                print(i.evaluation,end=" ")
+            print("\n")
+            for i in game_tree.root.moves:
+                print(i,end=" ")
+            print("\n")
             print("-----------------------------------------------------")
             # first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
             # last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
