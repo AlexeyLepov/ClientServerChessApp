@@ -77,14 +77,14 @@ class App(customtkinter.CTk):
         super().__init__()  # Parent class definition
 
         popup = customtkinter.CTk() # building popup window
-        popup.geometry("100x20")
-        
+        popup.geometry("200x40")
         
         # Setting initial window settings
         customtkinter.set_appearance_mode("dark") # change theme to DARK
         customtkinter.set_default_color_theme("dark-blue") # theme change (COLOR PALETTE)
+        self.iconbitmap("Assets/Icons/main.ico")
         self.resizable(False, False)
-        self.title("Игра в Шахматы")
+        self.title("")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         # self.minsize(App.WIDTH, App.HEIGHT)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -204,13 +204,13 @@ class App(customtkinter.CTk):
         self.frame_chat = customtkinter.CTkFrame(master=self.frame_playClient, width=365, height=App.B_HEIGHT, fg_color=("#C0C2C5","#343638"))
         self.frame_chat.grid(row=0, column=1, sticky="nswe", padx=5, pady=5)
         
-        self.frame_top_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, fg_color=("#C0C2C5","#343638"))
+        self.frame_top_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, text="", fg_color=("#C0C2C5","#343638"))
         self.frame_top_timeClient.grid(row=0, column=0, sticky="nswe", padx=5, pady=5)
         
         self.frame_board = customtkinter.CTkFrame(master=self.frame_chessClient, fg_color=(App.Colors.Board_White, App.Colors.Board_Black), width=App.B_WIDTH, height=App.B_HEIGHT)
         self.frame_board.grid(row=1, column=0, sticky="nswe", padx=5, pady=0)
         
-        self.frame_bottom_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, fg_color=("#C0C2C5","#343638"))
+        self.frame_bottom_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, text="",  fg_color=("#C0C2C5","#343638"))
         self.frame_bottom_timeClient.grid(row=2, column=0, sticky="nswe", padx=5, pady=5)
     
         ##########################################################
@@ -501,4 +501,4 @@ class App(customtkinter.CTk):
 if __name__ == "__main__":
     app = App()
     app.start()
-        
+  
