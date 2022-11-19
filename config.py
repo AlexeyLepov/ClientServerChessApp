@@ -1,4 +1,4 @@
-host = ""
-user = ""
+host = "localhost"
+user = "root"
 passwd = ""
-db = ""
+db = "chess"
