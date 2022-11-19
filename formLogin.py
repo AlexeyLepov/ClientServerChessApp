@@ -1,5 +1,26 @@
 import tkinter
 import customtkinter
+import pymysql
+
+
+from config import host, user, passwd, db 
+
+
+try:
+    connection = pymysql.connect(
+        host = config.host,
+        port = 3306,
+        user = config.user,
+        password = config.passwd,
+        database = config.db,
+        cursorclass = pymysql.cursors.DictCursor
+    )
+    print("Connection Connected successfully! ")
+except Exception:
+    print("Connection failure ... ")
+    print(Exception)
+
+
 
 
 ##############################
