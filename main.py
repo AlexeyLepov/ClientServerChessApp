@@ -16,12 +16,12 @@ import platform
 import itertools
 import customtkinter
 import tkinter.messagebox
-import chessLogic
 
 if platform.system == "Windows":
     os.environ['SDL_VIDEODRIVER'] = 'windib'
 
 import chessEngine
+import chessLogic
 
 
 
@@ -82,7 +82,7 @@ class App(customtkinter.CTk):
         # Setting initial window settings
         customtkinter.set_appearance_mode("dark") # change theme to DARK
         customtkinter.set_default_color_theme("dark-blue") # theme change (COLOR PALETTE)
-        #self.iconbitmap("Assets/Icons/main.ico")
+        self.iconbitmap(None)
         self.resizable(False, False)
         self.title("")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
