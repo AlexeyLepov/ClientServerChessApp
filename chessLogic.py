@@ -46,43 +46,43 @@ class Node:
         piece_arr = self.board.get_piece_arr()
         for line in board_array:
             for tile in line:
-                if tile == "WR":
-                    rook_advantage += 1
+                if tile == "BB":
+                    bishop_advantage -= 1
+                elif tile == "BK":
+                    king_advantage -= 1
+                elif tile == "BN":
+                    knight_advantage -= 1
+                elif tile == "BP":
+                    pawn_advantage -= 1
+                elif tile == "BQ":
+                    queen_advantage -= 1
                 elif tile == "BR":
                     rook_advantage -= 1
                 elif tile == "WB":
                     bishop_advantage += 1
-                elif tile == "BB":
-                    bishop_advantage -= 1
-                elif tile == "WN":
-                    knight_advantage += 1
-                elif tile == "BN":
-                    knight_advantage -= 1
-                elif tile == "WQ":
-                    queen_advantage += 1
-                elif tile == "BQ":
-                    queen_advantage -= 1
-                elif tile == "WP":
-                    pawn_advantage += 1
-                elif tile == "BP":
-                    pawn_advantage -= 1
                 elif tile == "WK":
                     king_advantage += 1
-                elif tile == "BK":
-                    king_advantage -= 1
+                elif tile == "WN":
+                    knight_advantage += 1
+                elif tile == "WP":
+                    pawn_advantage += 1
+                elif tile == "WQ":
+                    queen_advantage += 1
+                elif tile == "WR":
+                    rook_advantage += 1
         c2_1 = 0.01
         rook_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "rook":
                 if piece.color == chessEngine.Color.WHITE:
-                    for move in piece.correct_moves(piece_arr,None):
+                    for _ in piece.correct_moves(piece_arr,None):
                         rook_mobility_advantage+=1
-                    for move in piece.correct_captures(piece_arr,None):
+                    for _ in piece.correct_captures(piece_arr,None):
                         rook_mobility_advantage+=1
                 else:
-                    for move in piece.correct_moves(piece_arr, None):
+                    for _ in piece.correct_moves(piece_arr, None):
                         rook_mobility_advantage -= 1
-                    for move in piece.correct_captures(piece_arr,None):
+                    for _ in piece.correct_captures(piece_arr,None):
                         rook_mobility_advantage-=1
 
         c2_2 = 0.02
@@ -90,14 +90,14 @@ class Node:
         for piece in self.board.pieces:
             if piece.name == "bishop":
                 if piece.color == chessEngine.Color.WHITE:
-                    for move in piece.correct_moves(piece_arr, None):
+                    for _ in piece.correct_moves(piece_arr, None):
                         bishop_mobility_advantage += 1
-                    for move in piece.correct_captures(piece_arr, None):
+                    for _ in piece.correct_captures(piece_arr, None):
                         bishop_mobility_advantage += 1
                 else:
-                    for move in piece.correct_moves(piece_arr, None):
+                    for _ in piece.correct_moves(piece_arr, None):
                         bishop_mobility_advantage -= 1
-                    for move in piece.correct_captures(piece_arr, None):
+                    for _ in piece.correct_captures(piece_arr, None):
                         bishop_mobility_advantage  -= 1
 
         c2_3 = 0.03
@@ -105,7 +105,7 @@ class Node:
         for piece in self.board.pieces:
             if piece.name == "knight":
                 if piece.color == chessEngine.Color.WHITE:
-                    for move in piece.correct_moves(piece_arr, None):
+                    for _ in piece.correct_moves(piece_arr, None):
                         knight_mobility_advantage  += 1
                     for move in piece.correct_captures(piece_arr, None):
                         knight_mobility_advantage  += 1
