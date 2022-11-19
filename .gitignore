@@ -1,6 +1,7 @@
 .idea/*
 .venv/*
+.vscode/settings.json
 __pycache__/*
 __pycache__
 __pycache__/chessEngine.cpython-310.pyc
-.vscode/settings.json
+config.py
