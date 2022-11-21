@@ -4,7 +4,6 @@ import pymysql
 import config
 
 
-
 try:
     conn = pymysql.connect(
         host = config.host,
@@ -22,8 +21,6 @@ try:
 except Exception:
     print("Connection failure ... ")
     conn.close()
-
-
 
 
 ##############################
@@ -51,16 +48,20 @@ def buttonLoginClick():
     try:
         query = "SELECT username, password FROM users WHERE username = '" + entryUser.get() + "' AND password = '" + entryPassword.get() + "'"
         cur.execute(query)
-        selectUsers = cur.fetchall()
+        # selectUsers = cur.fetchall()
         if cur.rowcount == 1:
-            print("Вход в систему выполнен успешно! ")
+            print("Вы вошли в систему! ")
+            ...
+            conn.close()
         else:                
-            print("Неверный пароль! ")
+            print("Неверные учетные данные! ") # credential
+            labelError.configure(text="Неверные учетные данные! ")
     except Exception:
         labelError.configure(text="Ошибка")
     
 def buttonRegisterClick():
-    labelError.configure(text="Ошибка")
+    ...
+    conn.close()
     
 
 
