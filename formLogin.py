@@ -1,24 +1,27 @@
 import tkinter
 import customtkinter
 import pymysql
+import config
 
-
-from config import host, user, passwd, db 
 
 
 try:
-    connection = pymysql.connect(
+    conn = pymysql.connect(
         host = config.host,
-        port = 3306,
+        port = config.port,
         user = config.user,
-        password = config.passwd,
-        database = config.db,
+        password = config.password,
+        database = config.database,
         cursorclass = pymysql.cursors.DictCursor
     )
-    print("Connection Connected successfully! ")
+    cur = conn.cursor()
+    cur.execute("select @@version")
+    output = cur.fetchall()
+    print(output)
+    print("Connected successfully! ")
 except Exception:
     print("Connection failure ... ")
-    print(Exception)
+    conn.close()
 
 
 
@@ -45,10 +48,20 @@ formLogin.title("Вход в систему")
 #                              #
 ################################
 def buttonLoginClick():
-    labelError.configure(text="Ошибка")
+    try:
+        query = "SELECT username, password FROM users WHERE username = '" + entryUser.get() + "' AND password = '" + entryPassword.get() + "'"
+        cur.execute(query)
+        selectUsers = cur.fetchall()
+        if cur.rowcount == 1:
+            print("Вход в систему выполнен успешно! ")
+        else:                
+            print("Неверный пароль! ")
+    except Exception:
+        labelError.configure(text="Ошибка")
     
 def buttonRegisterClick():
     labelError.configure(text="Ошибка")
+    
 
 
 ##############################
@@ -65,7 +78,7 @@ labelWelcome.pack(pady=10, padx=10)
 entryUser = customtkinter.CTkEntry(master=frameLogin, width=WIDTH, placeholder_text="Введите логин")
 entryUser.pack(pady=10, padx=10)
 
-entryPassword = customtkinter.CTkEntry(master=frameLogin, width=WIDTH, placeholder_text="Введите пароль")
+entryPassword = customtkinter.CTkEntry(master=frameLogin, width=WIDTH, placeholder_text="Введите пароль", show="*")
 entryPassword.pack(pady=10, padx=10)
 
 buttonLogin = customtkinter.CTkButton(master=frameLogin, text="Войти", width=WIDTH, command=buttonLoginClick)
@@ -84,3 +97,4 @@ labelError.pack(pady=10, padx=10)
 #                           #
 #############################
 formLogin.mainloop()
+conn.close()
