@@ -25,16 +25,16 @@ DROP TABLE IF EXISTS `games`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `games` (
-  `idgames` int NOT NULL,
+  `idgames` int NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
   `winner` varchar(1) DEFAULT NULL,
   `w_player` int DEFAULT NULL,
   `b_player` int DEFAULT NULL,
   `moves` int DEFAULT NULL,
   PRIMARY KEY (`idgames`),
+  KEY `w_player_idx` (`w_player`),
   KEY `b_player_idx` (`b_player`),
-  KEY `moves` (`moves`),
-  KEY `w_player` (`w_player`),
+  KEY `moves_idx` (`moves`),
   CONSTRAINT `b_player` FOREIGN KEY (`b_player`) REFERENCES `users` (`idusers`),
   CONSTRAINT `moves` FOREIGN KEY (`moves`) REFERENCES `moves` (`idmoves`),
   CONSTRAINT `w_player` FOREIGN KEY (`w_player`) REFERENCES `users` (`idusers`)
@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `moves`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `moves` (
-  `idmoves` int NOT NULL,
+  `idmoves` int NOT NULL AUTO_INCREMENT,
   `file` blob,
   `w_timleft` time DEFAULT NULL,
   `b_timleft` time DEFAULT NULL,
@@ -83,13 +83,13 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `idusers` int NOT NULL,
+  `idusers` int NOT NULL AUTO_INCREMENT,
   `username` varchar(20) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(20) DEFAULT NULL,
   `score` int DEFAULT NULL,
   PRIMARY KEY (`idusers`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,6 +98,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'testuser','testuser@mail.ru','12345678',1000);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -110,4 +111,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-17 21:24:07
+-- Dump completed on 2022-11-21 12:31:19
