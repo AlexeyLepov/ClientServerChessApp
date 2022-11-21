@@ -1,5 +1,7 @@
 import tkinter
 import customtkinter
+import pymysql
+import config
 
 
 ##############################
@@ -10,12 +12,31 @@ import customtkinter
 customtkinter.set_appearance_mode("dark")  # Modes: "System", "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue", "green", "dark-blue"
 
-WIDTH = HEIGHT = 340
+WIDTH = HEIGHT = 350
 
 formRegister = customtkinter.CTk()
 formRegister.geometry(f"{WIDTH+100}x{HEIGHT+100}")
 formRegister.resizable(False, False)
 formRegister.title("Регистрация")
+
+
+try:
+    conn = pymysql.connect(
+        host = config.host,
+        port = config.port,
+        user = config.user,
+        password = config.password,
+        database = config.database,
+        cursorclass = pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+    cur.execute("select @@version")
+    output = cur.fetchall()
+    print(output)
+    print("Connected successfully! ")
+except Exception:
+    print("Connection failure ... ")
+    conn.close()
 
 
 ################################
@@ -24,10 +45,50 @@ formRegister.title("Регистрация")
 #                              #
 ################################
 def buttonLoginClick():
-    labelError.configure(text="Ошибка")
+    ...
+    conn.close()
 
 def buttonRegisterClick():
-    labelError.configure(text="Ошибка")
+    try:
+        if entryEmail.get() == "" or entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
+            print("Заполните все поля! ")
+            labelError.configure(text="Заполните все поля! ")
+
+        elif entryPassword.get() == entryPasswordRepeat.get():
+            score = 800
+            if comboboxScore.get() == "Новичок":
+                score = 600
+            elif comboboxScore.get() == "Любитель":
+                score = 1000
+            elif comboboxScore.get() == "Мастер":
+                score = 1400
+            # INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('test', 'test', 'test', '800');
+            query = f"INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('{entryUser.get()}', '{entryEmail.get()}', '{entryPassword.get()}', '{score}');"
+            
+            try:
+                cur.execute(query)
+                if cur:
+                    print(cur)
+                    print("Запись добавлена. ")
+                else:
+                    print(cur)
+                    print("Запись не добавлена.")
+                    labelError.configure(text="Ошибка! ")
+            except (pymysql.Error, pymysql.Warning) as e:
+                print(f'error! {e}')
+            
+            if cur.rowcount == 1:
+                print("Вы успешно зарегистрированы! ")
+                ...
+                conn.close()
+            else:                
+                print("Неверные учетные данные! ")
+                labelError.configure(text="Неверные учетные данные! ")
+        else:
+            print("Пароли должны совпадать! ")
+            labelError.configure(text="Пароли должны совпадать! ")
+    except Exception:
+        labelError.configure(text="Ошибка")
 
 
 ##############################
@@ -47,10 +108,10 @@ entryUser.pack(pady=10, padx=10)
 entryEmail = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите электронную почту")
 entryEmail .pack(pady=10, padx=10)
 
-entryPassword = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите пароль")
+entryPassword = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите пароль", show="*")
 entryPassword.pack(pady=10, padx=10)
 
-entryPasswordRepeat = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Подтвердите пароль")
+entryPasswordRepeat = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Подтвердите пароль", show="*")
 entryPasswordRepeat.pack(pady=10, padx=10)
 
 comboboxScore = customtkinter.CTkComboBox(frameRegister, width=WIDTH, values=["Новичок", "Любитель", "Мастер"])
