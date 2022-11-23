@@ -1,5 +1,4 @@
 import chessEngine
-from chessEngine import Board, Position
 import copy
 
 counter = 0
@@ -10,7 +9,7 @@ class Node:
         self.fen: str = fen_notation
         self.alpha: float = 0
         self.beta: float = 0
-        self.board: Board = None
+        self.board: chessEngine.Board = None
         self.is_white: bool = is_white
         self.children: list = []
         self.evaluation: float = 0
@@ -188,7 +187,7 @@ class Node:
                     break
             return min_evaluation
 
-    def move_straight(self,board:Board,move):
+    def move_straight(self, board: chessEngine.Board, move):
         if board.active_color == chessEngine.Color.WHITE:
             board.active_color = chessEngine.Color.BLACK
         else:
@@ -211,7 +210,7 @@ class Node:
                 break
 
 
-    def move_reverse(self,board:Board,move):
+    def move_reverse(self,board:chessEngine.Board,move):
         if board.active_color == chessEngine.Color.WHITE:
             board.active_color = chessEngine.Color.BLACK
         else:
@@ -300,7 +299,7 @@ class GameTree:
         self.is_white = is_white
 
     def alpha_beta_evaluation(self, depth):
-        self.root.board = Board.from_FEN(self.root.fen)
+        self.root.board = chessEngine.Board.from_FEN(self.root.fen)
         self.evaluation = self.root.alpha_beta_evaluation(depth, -10 ** 9, 10 ** 9, self.root.is_white)
         return self.evaluation
 
@@ -323,3 +322,63 @@ class GameTree:
                     move = self.root.moves[i]
                     child = self.root.children[i]
         return move, child
+
+
+def main():
+    board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
+    #board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
+    #board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("1n2kbnr/8/8/8/2PKPPbP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("1n2kbnr/8/8/8/2PPPPbP/8/8/8 b KQkq e3 0 1")
+    #board = Board.from_FEN("rnbqkbnr/8/8/8/KKKKKKKK/KKKKKKKK/8/K7 w KQkq e3 0 1")
+    #board = Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
+    arr = board.get_str_arr()
+    print(arr)
+    print(board.get_FEN())
+
+    print(f"color: e" + (
+        "White" if chessEngine.Color.WHITE else "Black") + f" W: {board.score[chessEngine.Color.WHITE]}, B: {board.score[chessEngine.Color.BLACK]}")
+    for n, i in enumerate(arr):
+        print(8 - n, *i)
+    print("  a  b  c  d  e  f  g  h")
+    while True:
+        print(board.get_FEN())
+        print(board.all_moves())
+        if board.active_color == chessEngine.Color.BLACK:
+
+            move = input("your move: ").split()
+            if move[0] == "exit":
+                break
+            first_pos = chessEngine.Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
+            last_pos = chessEngine.Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
+            print(first_pos, last_pos)
+            print(board.arr[first_pos.row][first_pos.col].position)
+            print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
+        else:
+            game_tree = GameTree(board.get_FEN(),True)
+            game_tree.alpha_beta_evaluation(5)
+            move,_ = game_tree.suggest_move()
+            print("-----------------------------------------------------")
+            #print(_.board)
+            print(move)
+            for i in game_tree.root.children:
+                print(i.evaluation,end=" ")
+            print("\n")
+            for i in game_tree.root.moves:
+                print(i,end=" ")
+            print("\n")
+            print("-----------------------------------------------------")
+            # first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
+            # last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
+            # print(first_pos, last_pos)
+            # print(board.arr[first_pos.row][first_pos.col].position)
+            print(board.move_piece(board.arr[move[0][0]][move[0][1]], chessEngine.Position(move[1][0],move[1][1])))
+        arr = board.get_str_arr()
+        print(f"color: {board.active_color}, W: {board.score[chessEngine.Color.WHITE]}, B: {board.score[chessEngine.Color.BLACK]}")
+        for n, i in enumerate(arr):
+            print(8 - n, *i)
+        print("  a  b  c  d  e  f  g  h")
+
+
+if __name__ == "__main__":
+    main()
