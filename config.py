@@ -1,5 +1,5 @@
-host = "127.0.0.1"
+host = "sql7.freesqldatabase.com"
 port = 3306
-user = "root"
-password = ""
-database = "chess"
+user = "sql7580065"
+password = "SDbLq8fluu"
+database = "sql7580065"
