@@ -225,6 +225,29 @@ class Piece:
                         moves.append(
                             Position(self.position.row + i, self.position.col + j))
 
+        if self.name == "king":
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (
+                            board_arr[self.position.row + i][self.position.col + j] is not None and
+                            board_arr[self.position.row + i][self.position.col + j].color != self.color):
+                        moves.append(
+                            Position(self.position.row + i, self.position.col + j))
+            if self.color == Color.WHITE and self.first_move:
+                if board_arr[0][3] == None and board_arr[0][2] == None and board_arr[0][1] == None and board_arr[0][
+                    0] != None and board_arr[0][0].name == "rook" and board_arr[0][0].first_move:
+                    moves.append(Position(0, 2))
+                if board_arr[0][5] == None and board_arr[0][6] == None and board_arr[0][7] != None and board_arr[0][
+                    7].name == "rook" and board_arr[0][7].first_move:
+                    moves.append(Position(0, 6))
+            if self.color == Color.BLACK and self.first_move:
+                if board_arr[7][3] == None and board_arr[7][2] == None and board_arr[7][1] == None and board_arr[7][
+                    0] != None and board_arr[7][0].name == "rook" and board_arr[7][0].first_move:
+                    moves.append(Position(7, 2))
+                if board_arr[7][5] == None and board_arr[7][6] == None and board_arr[7][7] != None and board_arr[7][
+                    7].name == "rook" and board_arr[7][7].first_move:
+                    moves.append(Position(7, 6))
+                    
         return moves
 
         # for move in moves:
@@ -313,15 +336,12 @@ class Piece:
                         break
                 else:
                     break
-                
         if self.name == "king":
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (
-                            board_arr[self.position.row + i][self.position.col + j] is not None and
-                            board_arr[self.position.row + i][self.position.col + j].color != self.color):
-                        captures.append(
-                            Position(self.position.row + i, self.position.col + j))
+                            board_arr[self.position.row + i][self.position.col + j] is not None):
+                        captures.append(Position(self.position.row + i, self.position.col + j))
         new_captures = []
         for move in captures: 
             #print(move)
@@ -489,8 +509,32 @@ class Board:
         #print(corr_moves)
         if piece.color != self.active_color:
             return False
+        
         if new_pos in corr_moves:
+            if piece.name == "king":
+                if piece.color == Color.WHITE:
+                    print(new_pos, Position(0, 6), new_pos == Position(0, 6), piece.first_move)
+                    if new_pos == Position(0, 2) and piece.first_move:
+                        print(2)
+                        rook = self.arr[0][0]
+                        rook.position = Position(0, 3)
+                        rook.first_move = False
+                    if new_pos == Position(0, 6) and piece.first_move:
+                        print(6)
+                        rook = self.arr[0][7]
+                        rook.position = Position(0, 5)
+                        rook.first_move = False
+                else:
+                    if new_pos == Position(7, 2) and piece.first_move:
+                        rook = self.arr[7][0]
+                        rook.position = Position(7, 3)
+                        rook.first_move = False
+                    if new_pos == Position(7, 6) and piece.first_move:
+                        rook = self.arr[7][7]
+                        rook.position = Position(7, 5)
+                        rook.first_move = False
             piece.position = new_pos
+            piece.first_move = False
             self.arr = self.get_piece_arr()
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
             return True

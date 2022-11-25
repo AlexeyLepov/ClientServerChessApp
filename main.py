@@ -434,7 +434,16 @@ class App(customtkinter.CTk):
         else:
             self.ButtonField[position.row][position.col].configure(image = None)
             piece = self.board.get_piece_arr()[position.row][position.col]
-            self.board.move_piece(piece, chessEngine.Position(row, col))
+            if self.board.move_piece(piece, chessEngine.Position(row, col)):
+                game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
+                game_tree.alpha_beta_evaluation(5)
+                move,_ = game_tree.suggest_move()
+                self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
+                self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
+            self.ButtonField[0][0].configure(image = None)
+            self.ButtonField[0][7].configure(image = None)
+            self.ButtonField[7][0].configure(image = None)
+            self.ButtonField[7][7].configure(image = None)
             self.UpdateBoard()
             str = self.board.get_str_arr()
             #print("_"*32+"\n")
