@@ -1,6 +1,8 @@
+import pymysql
 import tkinter
 import customtkinter
-import pymysql
+
+
 import config
 
 
