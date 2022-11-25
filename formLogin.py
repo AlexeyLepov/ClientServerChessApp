@@ -1,6 +1,8 @@
+import pymysql
 import tkinter
 import customtkinter
-import pymysql
+
+
 import config
 
 
@@ -20,7 +22,6 @@ try:
     print("Connected successfully! ")
 except Exception:
     print("Connection failure ... ")
-    conn.close()
 
 
 ##############################
@@ -51,8 +52,8 @@ def buttonLoginClick():
         # selectUsers = cur.fetchall()
         if cur.rowcount == 1:
             print("Вы вошли в систему! ")
+            labelError.configure(text="Вы вошли в систему! ")
             ...
-            conn.close()
         else:                
             print("Неверные учетные данные! ") # credential
             labelError.configure(text="Неверные учетные данные! ")
@@ -61,7 +62,6 @@ def buttonLoginClick():
     
 def buttonRegisterClick():
     ...
-    conn.close()
     
 
 
@@ -98,4 +98,3 @@ labelError.pack(pady=10, padx=10)
 #                           #
 #############################
 formLogin.mainloop()
-conn.close()
