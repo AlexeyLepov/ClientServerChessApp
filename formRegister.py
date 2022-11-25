@@ -36,11 +36,7 @@ try:
     print("Connected successfully! ")
 except Exception:
     print("Connection failure ... ")
-    try:
-        conn.close()
-    except Exception:
-        pass
-    
+    conn.close()
 
 
 ################################
@@ -67,11 +63,12 @@ def buttonRegisterClick():
             elif comboboxScore.get() == "Мастер":
                 score = 1400
             # INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('test', 'test', 'test', '800');
-            query = f"INSERT INTO `{config.database}`.`users` (`username`, `email`, `password`, `score`) VALUES ('{entryUser.get()}', '{entryEmail.get()}', '{entryPassword.get()}', '{score}');"
-            print(query)
+            query = f"INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('{entryUser.get()}', '{entryEmail.get()}', '{entryPassword.get()}', '{score}');"
+            
             try:
                 cur.execute(query)
                 if cur:
+                    print(cur)
                     print("Запись добавлена. ")
                 else:
                     print(cur)
@@ -79,11 +76,9 @@ def buttonRegisterClick():
                     labelError.configure(text="Ошибка! ")
             except (pymysql.Error, pymysql.Warning) as e:
                 print(f'error! {e}')
-                    
             
             if cur.rowcount == 1:
                 print("Вы успешно зарегистрированы! ")
-                conn.commit()
                 ...
                 conn.close()
             else:                
