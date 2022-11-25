@@ -1,5 +1,6 @@
 import socket
 import codecs
+import itertools
 
 def is_port_in_use(port: int) -> bool:
     import socket
@@ -32,14 +33,13 @@ class Board:
         buf1 = self.positions[x1][y1]
         buf2 = self.positions[x2][y2]
         newm=["","","","","","","",""]
-        for i in range(8):
-            for j in range(8):
-                if (((i==x1)and(j!=y1))or((i!=x1)and(j==y1))or((i!=x2)and(j==y2))or((i==x2)and(j!=y2))):
-                    newm[i]+=self.positions[i][j]
-                if ((i==x1)and(j==y1)):
-                    newm[i]+=buf2
-                if ((i==x2)and(j==y2)):
-                    newm[i]+=buf1
+        for i, j in itertools.product(range(8), range(8)):
+            if (((i==x1)and(j!=y1))or((i!=x1)and(j==y1))or((i!=x2)and(j==y2))or((i==x2)and(j!=y2))):
+                newm[i]+=self.positions[i][j]
+            if ((i==x1)and(j==y1)):
+                newm[i]+=buf2
+            if ((i==x2)and(j==y2)):
+                newm[i]+=buf1
         self.positions=newm
         self.show_board()
         self.nummov+=1
@@ -76,10 +76,11 @@ def send_board(conn,arr):
     send_to_client(conn,codecs.encode(R))
 
 def copy_pos(pos):
-    pos1=[]
-    for m in pos:
-        pos1.append(m)
-    return pos1
+    # pos1=[]
+    # for m in pos:
+    #     pos1.append(m)
+    # return pos1
+    return list(pos)
 
 board=Board()
 board.set_board()

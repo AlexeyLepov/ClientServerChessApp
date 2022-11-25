@@ -14,16 +14,17 @@ def connect_with_host(port):
 def receve_board(sock):
     print(sock.recv(1024))
 
-sock=connect_with_host(9091)
-for i in range(6):
+sock=connect_with_host(9090)
+for _ in range(6):
     tag = codecs.decode(sock.recv(1024))
-    if (tag=='2'):
+    if (tag=='1'):
         movestr=input("твой ход: ")
+        print(movestr)
         sock.send(codecs.encode(movestr))
+        print('sent')
     else:
         print("ход соперника")
-    receve_board(sock)
-
     #ty=sock.recv(1024)
+    receve_board(sock)
 
 sock.close()
