@@ -40,7 +40,7 @@ class Node:
         pawn_advantage = 0
         c1_5 = 1
         king_advantage = 0
-        c1_6 = 300
+        c1_6 = 10 ** 6
         board_array = self.board.get_str_arr()
         piece_arr = self.board.get_piece_arr()
         for line in board_array:
@@ -84,7 +84,7 @@ class Node:
                     for _ in piece.correct_captures(piece_arr, None):
                         rook_mobility_advantage -= 1
 
-        c2_2 = 0.02
+        c2_2 = 0.01
         bishop_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "bishop":
@@ -99,7 +99,7 @@ class Node:
                     for _ in piece.correct_captures(piece_arr, None):
                         bishop_mobility_advantage -= 1
 
-        c2_3 = 0.03
+        c2_3 = 0.01
         knight_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "knight":
@@ -152,12 +152,11 @@ class Node:
         #     print(8 - n, *i)
         # print("  a  b  c  d  e  f  g  h")
         w = self.is_won()
-        if w != 0:
-            return -is_white_player*10**9
-        if depth <= 1:
-            return self.get_static_evaluation()
-            return self.quiscence_search(15,alpha,beta,is_white_player,self.get_static_evaluation())
-            return is_white_player * self.quiscence_search(15,-beta,-alpha,-is_white_player,self.get_static_evaluation())
+        if depth <= 1 or w != 0:
+            return is_white_player*self.get_static_evaluation()
+            return self.quiscence_search(0, alpha, beta, is_white_player, self.get_static_evaluation())
+            # return is_white_player * self.quiscence_search(15, -beta, -alpha, -is_white_player,
+            #                                                self.get_static_evaluation())
             # return self.quiscence_search(0,alpha,beta,is_white_player)
 
         self.moves = self.board.all_moves()
@@ -220,13 +219,12 @@ class Node:
                 return
         raise Exception
 
-    def quiscence_search(self, depth:int, alpha:float, beta:float, is_white_player,stand_pat: float):
+    def quiscence_search(self, depth: int, alpha: float, beta: float, is_white_player, stand_pat: float):
         global counter
         counter += 1
         if counter % 10000 == 0:
-            print(counter)
+            print(counter, "q")
         delta = 2
-
 
         # arr = self.board.get_str_arr()
         # print(depth, self.is_white, interesting)
@@ -238,12 +236,9 @@ class Node:
             raise Exception
 
         w = self.is_won()
-        if w != 0:
-            return -is_white_player * 10 ** 9
-
         interesting = self.board.interesting_moves()
-        if len(interesting) == 0:
-            return stand_pat
+        if len(interesting) == 0 or w != 0:
+            return float(is_white_player) * float(self.get_static_evaluation())
 
         value: float = - 10 ** 9
         for move in interesting:
@@ -251,21 +246,22 @@ class Node:
             n: Node = Node(self.board.get_FEN(), not self.is_white)
             n.board = self.board
             self.children.append(n)
-            child_evaluation = -is_white_player*n.get_static_evaluation()
-            #if is_white_player*(child_evaluation-stand_pat) <delta:
-            self.evaluation: float = -n.quiscence_search(depth - 1, -beta, -alpha, -is_white_player,child_evaluation)
-            value = max(value, self.evaluation)
-            alpha = max(alpha, value)
+            child_evaluation = float(is_white_player) * float(n.get_static_evaluation())
+            # if is_white_player*(child_evaluation-stand_pat) <delta:
+            if (child_evaluation + delta) < alpha:
+                self.evaluation: float = -n.quiscence_search(depth - 1, -beta, -alpha, -is_white_player,
+                                                             -child_evaluation)
+                value = max(value, self.evaluation)
+                alpha = max(alpha, value)
 
             self.move_reverse(self.board, move)
             if beta <= alpha:
                 # print("pruned a")
                 break
-        if value< -10**7:
-            return stand_pat
+        if value < -10 ** 7:
+            return float(is_white_player) * float(self.get_static_evaluation())
         self.evaluation = value
         return value
-
 
     def is_won(self):
         king_advantage = 0
@@ -295,7 +291,7 @@ class GameTree:
         return self.evaluation
 
     def suggest_move(self, depth=None):
-        self.evaluation = 10**9
+        self.evaluation = 10 ** 9
         move = None
         child = None
         for i in range(len(self.root.children)):
@@ -307,17 +303,16 @@ class GameTree:
         return move, child
 
 
-
-
-
 def main():
-    board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
+    # board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
+    board = chessEngine.Board.from_FEN("rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq e3 0 1")
+    # board = chessEngine.Board.from_FEN("rnbqkbnr/8/8/8/8/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
     # board = Board.from_FEN("1n2kbnr/8/8/8/2PKPPbP/8/8/8 b KQkq e3 0 1")
     # board = Board.from_FEN("1n2kbnr/8/8/8/2PPPPbP/8/8/8 b KQkq e3 0 1")
     # board = chessEngine.Board.from_FEN("rnbqkbnr/8/8/8/8/8/8/K7 w KQkq e3 0 1")
-    # board = Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
+    # board = chessEngine.Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
     arr = board.get_str_arr()
     print(arr)
     print(board.get_FEN())
@@ -330,7 +325,7 @@ def main():
     while True:
         print(board.get_FEN())
         print(board.all_moves())
-        if board.active_color == chessEngine.Color.WHITE:
+        if board.active_color == chessEngine.Color.BLACK:
 
             move = input("your move: ").split()
             if move[0] == "exit":
@@ -341,23 +336,26 @@ def main():
             print(board.arr[first_pos.row][first_pos.col].position)
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
-            game_tree = GameTree(board.get_FEN(), False)
-            game_tree.alpha_beta_evaluation(5)
+            game_tree = GameTree(board.get_FEN(), True)
+            game_tree.alpha_beta_evaluation(4)
             move, _ = game_tree.suggest_move()
             print("-----------------------------------------------------")
             # print(_.board)
-            print(move)
-            for i in game_tree.root.children:
-                print(i.evaluation, end=" ")
-            print("\n")
-            for i in game_tree.root.moves:
-                print(i, end=" ")
-            print("\n")
+
+            for i in range(len(game_tree.root.children)):
+                print(game_tree.root.moves[i],game_tree.root.children[i].evaluation)
+            # for i in game_tree.root.children:
+            #     print(i.evaluation, end=" ")
+            # print("\n")
+            # for i in game_tree.root.moves:
+            #     print(i, end=" ")
+            # print("\n")
             print("-----------------------------------------------------")
             # first_pos = Position(int(move[0][1]) - 1, ord(move[0][0]) - ord("a"))
             # last_pos = Position(int(move[1][1]) - 1, ord(move[1][0]) - ord("a"))
             # print(first_pos, last_pos)
             # print(board.arr[first_pos.row][first_pos.col].position)
+            print(move)
             print(board.move_piece(board.arr[move[0][0]][move[0][1]], chessEngine.Position(move[1][0], move[1][1])))
         arr = board.get_str_arr()
         print(
