@@ -633,6 +633,19 @@ class Board:
         array = capture_arr+non_capture_arr
         return array
 
+    def all_captures(self):
+        capture_arr = []
+        piece_array = self.get_piece_arr()
+        for piece in self.pieces:
+            captures = piece.correct_captures(piece_array, None)
+            for move in captures:
+                if self.active_color == Color.WHITE and piece.color == Color.WHITE:
+                    capture_arr.append([[piece.position.row, piece.position.col], [move.row, move.col]])
+                if self.active_color == Color.BLACK and piece.color == Color.BLACK:
+                    capture_arr.append([[piece.position.row, piece.position.col], [move.row, move.col]])
+        return capture_arr
+
+
     def interesting_moves(self):
         capture_arr = []
         piece_array = self.get_piece_arr()
