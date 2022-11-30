@@ -153,7 +153,7 @@ class Node:
         if w != 0:
             return is_white_player * self.get_static_evaluation()
         if depth <= 0:
-            return is_white_player * self.get_static_evaluation()
+            return self.quiscence_search(0,alpha,beta,is_white_player,is_white_player*self.get_static_evaluation())
             return self.get_static_exchange_evaluation(0, alpha, beta, is_white_player, last_tile)
 
         self.moves = self.board.all_moves()
@@ -231,42 +231,29 @@ class Node:
         if counter % 10000 == 0:
             print(counter, "q")
         delta = 2
+        self.board: chessEngine.Board
+        self.moves = self.board.interesting_moves()
 
-        # arr = self.board.get_str_arr()
-        # print(depth, self.is_white, interesting)
-        # for n, i in enumerate(arr):
-        #     print(8 - n, *i)
-        # print("  a  b  c  d  e  f  g  h")
-        # print(depth, self.is_white, interesting)
-        if depth <= -100:
-            raise Exception
+        if len(self.moves) == 0 or self.is_won() != 0:
+            return is_white_player*self.get_static_evaluation()
 
-        w = self.is_won()
-        interesting = self.board.interesting_moves()
-        if len(interesting) == 0 or w != 0:
-            return float(is_white_player) * float(self.get_static_evaluation())
 
-        value: float = - 10 ** 9
-        for move in interesting:
-            self.move_straight(self.board, move)
-            n: Node = Node(self.board.get_FEN(), not self.is_white)
+        value = -10**9
+        for move in self.moves:
+            self.move_straight(self.board,move)
+            n = Node(self.board.get_FEN(),not self.is_white)
             n.board = self.board
-            self.children.append(n)
-            child_evaluation = float(is_white_player) * float(n.get_static_evaluation())
-            # if is_white_player*(child_evaluation-stand_pat) <delta:
-            if (child_evaluation + delta) < alpha:
-                self.evaluation: float = -n.quiscence_search(depth - 1, -beta, -alpha, -is_white_player,
-                                                             -child_evaluation)
-                value = max(value, self.evaluation)
-                alpha = max(alpha, value)
+            child_evaluation = is_white_player*n.get_static_evaluation()
+            if child_evaluation + delta >= stand_pat:
+                self.children.append(n)
+                self.evaluation = -n.quiscence_search(depth-1,-beta,-alpha,-is_white_player,-child_evaluation)
+                value = max(self.evaluation,value)
+                alpha = max(alpha,value)
 
-            self.move_reverse(self.board, move)
-            if beta <= alpha:
-                # print("pruned a")
+            self.move_reverse(self.board,move)
+            if alpha >= beta:
+                self.evaluation = value
                 break
-        if value < -10 ** 7:
-            return float(is_white_player) * float(self.get_static_evaluation())
-        self.evaluation = value
         return value
 
     def get_static_exchange_evaluation(self, depth: int, alpha: float, beta: float, is_white_player, exch_tile):
