@@ -238,7 +238,7 @@ class Node:
             return is_white_player*self.get_static_evaluation()
 
 
-        value = -10**9
+        value = stand_pat
         for move in self.moves:
             self.move_straight(self.board,move)
             n = Node(self.board.get_FEN(),not self.is_white)
@@ -254,6 +254,7 @@ class Node:
             if alpha >= beta:
                 self.evaluation = value
                 break
+        self.evaluation = value
         return value
 
     def get_static_exchange_evaluation(self, depth: int, alpha: float, beta: float, is_white_player, exch_tile):
@@ -328,6 +329,7 @@ class GameTree:
         self.root.board = chessEngine.Board.from_FEN(self.root.fen)
         self.evaluation = self.root.alpha_beta_evaluation(depth, -10 ** 9, 10 ** 9, 1 if self.root.is_white else -1,
                                                           None)
+        print('a')
         return self.evaluation
 
     def suggest_move(self, depth=None):
@@ -340,6 +342,41 @@ class GameTree:
                 self.evaluation = self.root.children[i].evaluation
                 move = self.root.moves[i]
                 child = self.root.children[i]
+
+        fout = open("bestMoveLogger.txt","w")
+        arr = self.root.board.get_str_arr()
+
+        for n, i in enumerate(arr):
+            fout.write(str(8 - n) + " ")
+            for j in i:
+                fout.write(str(j) + " ")
+            fout.write("\n")
+        print("\n" + "  a  b  c  d  e  f  g  h" + "\n" + "\n")
+
+        go = True
+        node = child
+        while go:
+            go = False
+            arr = chessEngine.Board.from_FEN(node.fen).get_str_arr()
+            for n, i in enumerate(arr):
+                fout.write(str(8 - n) + " ")
+                for j in i:
+                    fout.write(str(j) + " ")
+                fout.write("\n")
+            fout.write("  a  b  c  d  e  f  g  h" + "\n" + "\n")
+            for ch in node.children:
+                print(node.evaluation, " ", ch.evaluation)
+                if round(ch.evaluation,5) == round(-node.evaluation,5):
+                    go = True
+                    node = ch
+                    break
+
+
+
+        fout.close()
+
+
+
         return move, child
 
 
@@ -377,7 +414,7 @@ def main():
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
             game_tree = GameTree(board.get_FEN(), True)
-            game_tree.alpha_beta_evaluation(3)
+            game_tree.alpha_beta_evaluation(4)
             move, _ = game_tree.suggest_move()
             print("-----------------------------------------------------")
 
