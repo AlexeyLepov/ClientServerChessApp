@@ -1,0 +1,48 @@
+8 BR BN    BQ BK BB    BR 
+7 BP BP BP       BP BP BP 
+6          BP    BN       
+5                         
+4                         
+3       WN WP    BB       
+2 WP WP WP    WP WP WP WP 
+1 WR    WB WQ WK WB    WR 
+8 BR BN    BQ BK BB    BR 
+7 BP BP BP       BP BP BP 
+6          BP    BN       
+5                         
+4                         
+3       WN WP    WP       
+2 WP WP WP       WP WP WP 
+1 WR    WB WQ WK WB    WR 
+  a  b  c  d  e  f  g  h
+
+8 BR       BQ BK BB    BR 
+7 BP BP BP       BP BP BP 
+6       BN BP    BN       
+5                         
+4                         
+3       WN WP    WP       
+2 WP WP WP       WP WP WP 
+1 WR    WB WQ WK WB    WR 
+  a  b  c  d  e  f  g  h
+
+8 BR       BQ BK BB    BR 
+7 BP BP BP       BP BP BP 
+6       BN BP    BN       
+5                         
+4                         
+3       WN WP WB WP       
+2 WP WP WP       WP WP WP 
+1 WR       WQ WK WB    WR 
+  a  b  c  d  e  f  g  h
+
+8 BR       BQ BK BB    BR 
+7 BP BP          BP BP BP 
+6       BN BP    BN       
+5       BP                
+4                         
+3       WN WP WB WP       
+2 WP WP WP       WP WP WP 
+1 WR       WQ WK WB    WR 
+  a  b  c  d  e  f  g  h
+
