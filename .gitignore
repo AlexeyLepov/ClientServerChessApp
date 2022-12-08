@@ -2,5 +2,6 @@
 .venv/*
 .vscode/*
 __pycache__/*
+Testing/__pycache__/*
 config.py
 bestMoveLogger.txt
