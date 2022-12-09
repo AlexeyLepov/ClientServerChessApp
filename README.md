@@ -6,10 +6,10 @@
 - Томилов Даниил
 - Лепов Алексей
 
-## Presentation
+## Презентация (ТЗ)
 https://user-images.githubusercontent.com/77492646/197358178-4cc20351-ce13-447a-94af-b9170a1ab9da.mov
 
-## Figma GUI concept
+## Figma GUI
 https://www.figma.com/file/DbeZuBQntB6vNV6nhXkd9s/ClientServerChessApp?node-id=0%3A1
 
 ## IDEF0 Context
