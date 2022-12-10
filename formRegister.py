@@ -36,9 +36,9 @@ try:
     output = cur.fetchall()
     print(output)
     print("Connected successfully! ")
+    conn.close()
 except Exception:
     print("Connection failure ... ")
-    conn.close()
 
 
 ################################
@@ -48,7 +48,7 @@ except Exception:
 ################################
 def buttonLoginClick():
     ...
-    conn.close()
+    # conn.close()
 
 def buttonRegisterClick():
     try:
