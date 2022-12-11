@@ -26,8 +26,8 @@ CREATE TABLE `games` (
   `idgames` int NOT NULL,
   `date` datetime DEFAULT NULL,
   `winner` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `w_player` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `b_player` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `w_player` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `b_player` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `moves` int DEFAULT NULL,
   PRIMARY KEY (`idgames`),
   KEY `moves_idx` (`moves`),
@@ -78,7 +78,6 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `password` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `score` int DEFAULT NULL,
   PRIMARY KEY (`username`)
@@ -103,4 +102,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-11 20:22:46
+-- Dump completed on 2022-12-11 23:25:36
