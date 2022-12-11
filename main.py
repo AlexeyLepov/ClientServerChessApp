@@ -7,6 +7,7 @@
 #################################################################################################################################################################################
 
 # importing external libraries
+import gc
 import os
 import sys
 import pymysql
@@ -22,10 +23,179 @@ from PIL import Image
 import config
 import chessEngine
 import chessLogic
-import formLogin
 
 global username
 global password
+
+
+#################################################################################################################################################################################
+#################################################################################################################################################################################
+# 
+#  Setting login window parameters
+#
+#################################################################################################################################################################################
+#################################################################################################################################################################################
+def openFormLogin():
+    LOGIN_WIDTH = LOGIN_HEIGHT = 250
+    formLogin = customtkinter.CTk()
+    formLogin.geometry(f"{LOGIN_WIDTH+100}x{LOGIN_HEIGHT}")
+    formLogin.resizable(False, False)
+    formLogin.title("Вход в систему")
+    formLogin.eval('tk::PlaceWindow . center')
+
+    def buttonLoginClick():
+        try:
+            conn = pymysql.connect(
+                host = config.host,
+                port = config.port,
+                user = config.user,
+                password = config.password,
+                database = config.database,
+                cursorclass = pymysql.cursors.DictCursor
+            )
+            print("Connected successfully! ")
+            try:
+                with conn.cursor() as cur:
+                    query = "SELECT username, password FROM users WHERE username = '" + entryUser.get() + "' AND password = '" + entryPassword.get() + "'"
+                    cur.execute(query)
+                    conn.commit()
+                if cur:
+                    print(cur)
+                    print("User found!")
+                else:
+                    print(cur)
+                    print("No record has been added ...")
+                    labelError.configure(text="Ошибка! ")
+                if cur.rowcount == 1:
+                    print("Вы вошли в систему! ")
+                    labelError.configure(text="Вы вошли в систему! ")
+                    username = entryUser.get()
+                    password = entryPassword.get()
+                else:                
+                    print("Неверные учетные данные! ") # credential
+                    labelError.configure(text="Неверные учетные данные! ")
+            except (pymysql.Error, pymysql.Warning) as e:
+                print(f'error! {e}')
+                labelError.configure(text=f'Ошибка! {e}')
+            finally:
+                conn.close()
+        except Exception:
+            print("Connection failure ... ")
+            labelError.configure(text="Нет подключения к серверу ... ")
+
+    #creating elements
+    frameLogin = customtkinter.CTkFrame(master=formLogin)
+    labelWelcome = customtkinter.CTkLabel(master=frameLogin, justify=tkinter.CENTER, width=LOGIN_WIDTH, text="Вход в систему")
+    entryUser = customtkinter.CTkEntry(master=frameLogin, width=LOGIN_WIDTH, placeholder_text="Введите логин")
+    entryPassword = customtkinter.CTkEntry(master=frameLogin, width=LOGIN_WIDTH, placeholder_text="Введите пароль", show="*")
+    buttonLogin = customtkinter.CTkButton(master=frameLogin, text="Войти", width=LOGIN_WIDTH, command = buttonLoginClick)
+    labelError = customtkinter.CTkLabel(master=frameLogin, justify=tkinter.CENTER, width=LOGIN_WIDTH, text="")
+    #packing elements
+    frameLogin.pack(
+        pady=10, padx=10, fill="both", expand=True)
+    labelWelcome.pack(
+        pady=10, padx=10)
+    entryUser.pack(
+        pady=10, padx=10)
+    entryPassword.pack(
+        pady=10, padx=10)
+    buttonLogin.pack(
+        pady=10, padx=10)
+    labelError.pack(
+        pady=10, padx=10)
+
+
+#################################################################################################################################################################################
+#################################################################################################################################################################################
+# 
+#  Setting register window parameters
+#
+#################################################################################################################################################################################
+#################################################################################################################################################################################
+def openFormRegister():
+    REG_WIDTH = REG_HEIGHT = 350
+    formRegister = customtkinter.CTk()
+    formRegister.geometry(f"{REG_WIDTH+100}x{REG_HEIGHT}")
+    formRegister.resizable(False, False)
+    formRegister.title("Регистрация")
+    formRegister.eval('tk::PlaceWindow . center')
+
+    def buttonRegisterClick():
+        if entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
+            print("Заполните все поля! ")
+            labelError.configure(text="Заполните все поля! ")
+        elif entryPassword.get() == entryPasswordRepeat.get():
+            score = 1000
+            if comboboxScore.get() == "Новичок":
+                score = 600
+            elif comboboxScore.get() == "Любитель":
+                score = 1000
+            elif comboboxScore.get() == "Мастер":
+                score = 1400
+            try:
+                conn = pymysql.connect(
+                    host = config.host,
+                    port = config.port,
+                    user = config.user,
+                    password = config.password,
+                    database = config.database,
+                    cursorclass = pymysql.cursors.DictCursor
+                )
+                print("Connected successfully! ")
+                try:
+                    with conn.cursor() as cur:
+                        query = "INSERT INTO `users` (`username`, `password`, `score`) VALUES ('" + entryUser.get() + "', '" + entryPassword.get() + "', '" + str(score) + "');"
+                        cur.execute(query)
+                        conn.commit()
+                    if cur:
+                        print(cur)
+                        print("New record added! ")
+                    else:
+                        print(cur)
+                        print("No record has been added ...")
+                        labelError.configure(text="Ошибка! ")
+                    if cur.rowcount == 1:
+                        print("Вы успешно зарегистрированы! ")
+                        labelError.configure(text="Вы успешно зарегистрированы! ")
+                    else:                
+                        print("Неверные учетные данные! ")
+                        labelError.configure(text="Неверные учетные данные! ")
+                except (pymysql.Error, pymysql.Warning) as e:
+                    print(f'error! {e}')
+                    labelError.configure(text=f'Ошибка! {e}')
+                finally:
+                    conn.close()
+            except Exception:
+                print("Connection failure ... ")
+                labelError.configure(text="Нет подключения к серверу ... ")
+        else:
+            print("Пароли должны совпадать! ")
+            labelError.configure(text="Пароли должны совпадать! ")
+
+    frameRegister = customtkinter.CTkFrame(master=formRegister)
+    labelWelcome = customtkinter.CTkLabel(master=frameRegister, justify=tkinter.CENTER, width=REG_WIDTH, text="Регистрация")
+    entryUser = customtkinter.CTkEntry(master=frameRegister, width=REG_WIDTH, placeholder_text="Введите логин")
+    entryPassword = customtkinter.CTkEntry(master=frameRegister, width=REG_WIDTH, placeholder_text="Введите пароль", show="*")
+    entryPasswordRepeat = customtkinter.CTkEntry(master=frameRegister, width=REG_WIDTH, placeholder_text="Подтвердите пароль", show="*")
+    comboboxScore = customtkinter.CTkComboBox(frameRegister, width=REG_WIDTH, values=["Новичок", "Любитель", "Мастер"])
+    buttonRegister = customtkinter.CTkButton(master=frameRegister, width=REG_WIDTH, text="Зарегистрироваться", command = buttonRegisterClick)
+    labelError = customtkinter.CTkLabel(master=frameRegister, width=REG_WIDTH, justify=tkinter.CENTER, text="")
+    frameRegister.pack(
+        pady=10, padx=10, fill="both", expand=True)
+    labelWelcome.pack(
+        pady=10, padx=10)
+    entryUser.pack(
+        pady=10, padx=10)
+    entryPassword.pack(
+        pady=10, padx=10)
+    entryPasswordRepeat.pack(
+        pady=10, padx=10)
+    comboboxScore.pack(
+        pady=12, padx=10)
+    buttonRegister.pack(
+        pady=10, padx=10)
+    labelError.pack(
+        pady=10, padx=10)
 
 
 #################################################################################################################################################################################
@@ -123,7 +293,7 @@ class App(customtkinter.CTk):
 #################################################################################################################################################################################
 #################################################################################################################################################################################
 # 
-#   Creation of panels (frames)
+#   Create panels (frames)
 #
 #################################################################################################################################################################################
 #################################################################################################################################################################################
@@ -141,9 +311,9 @@ class App(customtkinter.CTk):
         self.frame_menu.grid_rowconfigure(11, minsize=10)
         # Adding elements to the menu
         self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="МЕНЮ", font=("Roboto Medium", -16)) # Label
-        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Играть", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_playClient_event)
-        self.button_profile = customtkinter.CTkButton(master=self.frame_menu, text="Профиль", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_profile_event)
-        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=("gray75", "#64897e"), width=180, height=60, command=self.button_info_event)
+        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Играть", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_playClient_event)
+        self.button_profile = customtkinter.CTkButton(master=self.frame_menu, text="Профиль", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_profile_event)
+        self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_info_event)
         self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_theme_mode) # Dark theme switcher
         # Packing elements
         self.label_menu.grid(
@@ -218,11 +388,17 @@ class App(customtkinter.CTk):
         self.frame_profile.columnconfigure(0, weight=1)
         self.frame_profile.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         # Adding elements to the form
-        self.frame_profileUser = customtkinter.CTkLabel(master=self.frame_profile, height=40, text="Hello, ",  fg_color=("#C0C2C5","#343638"))
+        self.frame_profileInfo = customtkinter.CTkLabel(master=self.frame_profile, height=100, text="Hello, guest!",  fg_color=("#C0C2C5","#343638"))
+        self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
+        self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
         # Packing elements
-        self.frame_profileUser.grid(
+        self.frame_profileInfo.grid(
+            row=0, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonLogin.grid(
+            row=1, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonReg.grid(
             row=2, column=0, sticky="nswe", padx=5, pady=5)
-
+        
 
 #################################################################################################################################################################################
 #################################################################################################################################################################################
@@ -363,6 +539,15 @@ class App(customtkinter.CTk):
         self.destroy()
     def start(self):
         self.mainloop()
+    ###################################################
+    #                                                 #
+    #    clocking on login button on profile frame    #
+    #                                                 #
+    ###################################################
+    def frame_profileButtonLogin_event(self):
+        openFormLogin()
+    def frame_profileButtonReg_event(self):
+        openFormRegister()
 
 
 #################################################################################################################################################################################
