@@ -1,7 +1,9 @@
 .idea/*
 .venv/*
 .vscode/*
+.Nolongerinuse/*
 __pycache__/*
 Testing/__pycache__/*
+
 config.py
 bestMoveLogger.txt
