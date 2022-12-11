@@ -62,6 +62,7 @@ class App(customtkinter.CTk):
         Field_Correct_Capture = "#f28482"       # The color of the fields in which the enemy piece stands
         Moving_Piece = "#87a937"                # The color of the selected piece
         Users_Current = chessEngine.Color.WHITE # Player Color
+        Menu_Button = "#6a994e"
     # selected button class
     class SelectedButtonField:
         selected = False
@@ -76,7 +77,7 @@ class App(customtkinter.CTk):
         super().__init__() # Parent class definition
         # Setting initial window settings
         customtkinter.set_appearance_mode("dark") # change theme to DARK
-        customtkinter.set_default_color_theme("dark-blue") # theme change (COLOR PALETTE)
+        customtkinter.set_default_color_theme("green") # theme change (COLOR PALETTE)
         self.resizable(False, False)
         self.title("")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
@@ -217,13 +218,14 @@ class App(customtkinter.CTk):
         #                                 #
         ###################################
         self.frame_profile = customtkinter.CTkFrame(master=self)
-        self.frame_profile.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         self.frame_profile.rowconfigure(14, weight=10)
         self.frame_profile.columnconfigure(0, weight=1)
+        self.frame_profile.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         # Adding elements to the form
         self.frame_profileUser = customtkinter.CTkLabel(master=self.frame_profile, height=40, text="Hello, ",  fg_color=("#C0C2C5","#343638"))
         # Packing elements
-        self.frame_profileUser.grid(row=2, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileUser.grid(
+            row=2, column=0, sticky="nswe", padx=5, pady=5)
 
 
 #################################################################################################################################################################################
@@ -256,9 +258,9 @@ class App(customtkinter.CTk):
         self.frame_playClient.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
         self.switch_dark_theme.select()
         if self.switch_dark_theme.get() == 1:
-            self.button_playClient.configure(fg_color=("gray75", "#5c8da4"))
+            self.button_playClient.configure(fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button))
         else:
-            self.button_playClient.configure(fg_color=("#7db8d4"))
+            self.button_playClient.configure(fg_color=(App.Colors.Menu_Button))
 
 
 #################################################################################################################################################################################
@@ -327,23 +329,23 @@ class App(customtkinter.CTk):
         self.hide_menu_frames()
         self.frame_info.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         if self.switch_dark_theme.get() == 1:
-            self.button_info.configure(fg_color=("gray75", "#5c8da4"))
+            self.button_info.configure(fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button))
         else:
-            self.button_info.configure(fg_color=("#7db8d4"))
+            self.button_info.configure(fg_color=(App.Colors.Menu_Button))
     def button_playClient_event(self):
         self.hide_menu_frames()
         self.frame_playClient.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         if self.switch_dark_theme.get() == 1:
-            self.button_playClient.configure(fg_color=("gray75", "#5c8da4"))
+            self.button_playClient.configure(fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button))
         else:
-            self.button_playClient.configure(fg_color=("#7db8d4"))
+            self.button_playClient.configure(fg_color=(App.Colors.Menu_Button))
     def button_profile_event(self):
         self.hide_menu_frames()
         self.frame_profile.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         if self.switch_dark_theme.get() == 1:
-            self.button_profile.configure(fg_color=("gray75", "#5c8da4"))
+            self.button_profile.configure(fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button))
         else:
-            self.button_profile.configure(fg_color=("#7db8d4"))
+            self.button_profile.configure(fg_color=(App.Colors.Menu_Button))
     ###############################
     #                             #
     #    theme change function    #
@@ -417,10 +419,6 @@ class App(customtkinter.CTk):
             move,_ = game_tree.suggest_move()
             self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
             self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
-        self.ButtonField[0][0].configure(image = None)
-        self.ButtonField[0][7].configure(image = None)
-        self.ButtonField[7][0].configure(image = None)
-        self.ButtonField[7][7].configure(image = None)
         self.UpdateBoard()
         str = self.board.get_str_arr()
     #######################################################
@@ -439,6 +437,10 @@ class App(customtkinter.CTk):
             self.ButtonField[i][j].configure(image = None)
     def UpdateBoard(self):
         self.RecolorBoard()
+        self.ButtonField[0][0].configure(image = None)
+        self.ButtonField[0][7].configure(image = None)
+        self.ButtonField[7][0].configure(image = None)
+        self.ButtonField[7][7].configure(image = None)
         for piece in self.board.pieces:
             position = piece.position
             self.ButtonField[position.row][position.col].configure(image = self.pieceImage(piece.name, piece.color))
@@ -448,22 +450,20 @@ class App(customtkinter.CTk):
     #                                                             #
     ###############################################################
     def SelectedField(self):
-        # position = chessEngine.Position
-        # for i, j in itertools.product(range(8), range(8)):
-        #     # if self.ButtonField[i][j].fg_color == (App.Colors.Moving_Piece, App.Colors.Moving_Piece):
-        #     if self.ButtonField[i][j].fg_color==(App.Colors.Moving_Piece, App.Colors.Moving_Piece):
-        #         position.row = i
-        #         position.col = j
-        #         return position
-        # return None
-        position = chessEngine.Position
         if App.SelectedButtonField.selected == True:
+            position = chessEngine.Position
             position.row = App.SelectedButtonField.row
             position.col = App.SelectedButtonField.col
-            return position 
+            return position
+        # if clicked piece has the same color as selected one
+        # elif App.SelectedButtonField.selected == False and ...: 
+            # position = chessEngine.Position
+            # position.row = App.SelectedButtonField.row
+            # position.col = App.SelectedButtonField.col
+            # return position 
         return None
 
-
+ 
 #################################################################################################################################################################################
 #################################################################################################################################################################################
 # 
