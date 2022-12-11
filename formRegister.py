@@ -18,6 +18,8 @@ formRegister = customtkinter.CTk()
 formRegister.geometry(f"{WIDTH+100}x{HEIGHT+100}")
 formRegister.resizable(False, False)
 formRegister.title("Регистрация")
+formRegister.eval('tk::PlaceWindow . center')
+# formRegister.withdraw()
 
 
 ################################
@@ -29,59 +31,57 @@ def buttonLoginClick():
     ...
 
 def buttonRegisterClick():
-    try:
-        if entryEmail.get() == "" or entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
-            print("Заполните все поля! ")
-            labelError.configure(text="Заполните все поля! ")
-
-        elif entryPassword.get() == entryPasswordRepeat.get():
-            score = 800
-            if comboboxScore.get() == "Новичок":
-                score = 600
-            elif comboboxScore.get() == "Любитель":
-                score = 1000
-            elif comboboxScore.get() == "Мастер":
-                score = 1400
-            # INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('test', 'test', 'test', '800');
-            query = f"INSERT INTO `chess`.`users` (`username`, `email`, `password`, `score`) VALUES ('{entryUser.get()}', '{entryEmail.get()}', '{entryPassword.get()}', '{score}');"
+    if entryEmail.get() == "" or entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
+        print("Заполните все поля! ")
+        labelError.configure(text="Заполните все поля! ")
+    elif entryPassword.get() == entryPasswordRepeat.get():
+        score = 1000
+        if comboboxScore.get() == "Новичок":
+            score = 600
+        elif comboboxScore.get() == "Любитель":
+            score = 1000
+        elif comboboxScore.get() == "Мастер":
+            score = 1400
+        try:
+            conn = pymysql.connect(
+                host = config.host,
+                port = config.port,
+                user = config.user,
+                password = config.password,
+                database = config.database,
+                cursorclass = pymysql.cursors.DictCursor
+            )
+            print("Connected successfully! ")
             try:
-                conn = pymysql.connect(
-                    host = config.host,
-                    port = config.port,
-                    user = config.user,
-                    password = config.password,
-                    database = config.database,
-                    cursorclass = pymysql.cursors.DictCursor
-                )
-                cur = conn.cursor()
-                print("Connected successfully! ")
-                try:
+                with conn.cursor() as cur:
+                    query = "INSERT INTO `users` (`username`, `email`, `password`, `score`) VALUES ('" + entryUser.get() + "', '" + entryEmail.get() + "', '" + entryPassword.get() + "', '" + str(score) + "');"
                     cur.execute(query)
-                    if cur:
-                        print(cur)
-                        print("New record added! ")
-                    else:
-                        print(cur)
-                        print("No record has been added ...")
-                        labelError.configure(text="Ошибка! ")
-                except (pymysql.Error, pymysql.Warning) as e:
-                    print(f'error! {e}')
-                    labelError.configure(text=f'Ошибка! {e}')
+                    conn.commit()
+                if cur:
+                    print(cur)
+                    print("New record added! ")
+                else:
+                    print(cur)
+                    print("No record has been added ...")
+                    labelError.configure(text="Ошибка! ")
                 if cur.rowcount == 1:
                     print("Вы успешно зарегистрированы! ")
-                    ...
-                    conn.close()
+                    labelError.configure(text="Вы успешно зарегистрированы! ")
                 else:                
                     print("Неверные учетные данные! ")
                     labelError.configure(text="Неверные учетные данные! ")
-            except Exception:
-                print("Connection failure ... ")
-                labelError.configure(text="Нет подключения к серверу ... ")
-        else:
-            print("Пароли должны совпадать! ")
-            labelError.configure(text="Пароли должны совпадать! ")
-    except Exception:
-        labelError.configure(text="Ошибка")
+            except (pymysql.Error, pymysql.Warning) as e:
+                print(f'error! {e}')
+                labelError.configure(text=f'Ошибка! {e}')
+            finally:
+                conn.close()
+        except Exception:
+            print("Connection failure ... ")
+            labelError.configure(text="Нет подключения к серверу ... ")
+    else:
+        print("Пароли должны совпадать! ")
+        labelError.configure(text="Пароли должны совпадать! ")
+    ...
 
 
 ##############################
@@ -126,24 +126,24 @@ labelError.pack(
 #    Test connection to DB     #
 #                              #
 ################################
-try:
-    conn = pymysql.connect(
-        host = config.host,
-        port = config.port,
-        user = config.user,
-        password = config.password,
-        database = config.database,
-        cursorclass = pymysql.cursors.DictCursor
-    )
-    cur = conn.cursor()
-    cur.execute("select @@version")
-    output = cur.fetchall()
-    print(output)
-    print("Connected successfully! ")
-    conn.close()
-except Exception:
-    print("Connection failure ... ")
-    labelError.configure(text="Нет подключения к серверу ... ")
+# try:
+#     conn = pymysql.connect(
+#         host = config.host,
+#         port = config.port,
+#         user = config.user,
+#         password = config.password,
+#         database = config.database,
+#         cursorclass = pymysql.cursors.DictCursor
+#     )
+#     cur = conn.cursor()
+#     cur.execute("select @@version")
+#     output = cur.fetchall()
+#     print(output)
+#     print("Connected successfully! ")
+#     conn.close()
+# except Exception:
+#     print("Connection failure ... ")
+#     labelError.configure(text="Нет подключения к серверу ... ")
 
 
 formRegister.mainloop()
