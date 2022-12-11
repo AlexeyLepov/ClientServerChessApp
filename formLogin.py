@@ -18,6 +18,8 @@ formLogin = customtkinter.CTk()
 formLogin.geometry(f"{WIDTH+100}x{HEIGHT+100}")
 formLogin.resizable(False, False)
 formLogin.title("Вход в систему")
+formLogin.eval('tk::PlaceWindow . center')
+# formLogin.withdraw()
 
 
 ################################
@@ -27,33 +29,45 @@ formLogin.title("Вход в систему")
 ################################
 def buttonLoginClick():
     try:
-        query = "SELECT username, password FROM users WHERE username = '" + entryUser.get() + "' AND password = '" + entryPassword.get() + "'"
-        cur.execute(query)
-        # selectUsers = cur.fetchall()
-        if cur.rowcount == 1:
-            print("Вы вошли в систему! ")
-            labelError.configure(text="Вы вошли в систему! ")
-            ...
-        else:                
-            print("Неверные учетные данные! ") # credential
-            labelError.configure(text="Неверные учетные данные! ")
+        conn = pymysql.connect(
+            host = config.host,
+            port = config.port,
+            user = config.user,
+            password = config.password,
+            database = config.database,
+            cursorclass = pymysql.cursors.DictCursor
+        )
+        cur = conn.cursor()
+        cur.execute("select @@version")
+        output = cur.fetchall()
+        print(output)
+        print("Connected successfully! ")
+        try:
+            username = entryUser.get()
+            password = entryPassword.get()
+            query = "SELECT username, password FROM users WHERE username = '" + username + "' AND password = '" + password + "'"
+            cur.execute(query)
+            # selectUsers = cur.fetchall()
+            if cur.rowcount == 1:
+                print("Вы вошли в систему! ")
+                labelError.configure(text="Вы вошли в систему! ")
+                ...
+            else:                
+                print("Неверные учетные данные! ") # credential
+                labelError.configure(text="Неверные учетные данные! ")
+        except Exception:
+            labelError.configure(text="Ошибка")
+        conn.close()
     except Exception:
-        labelError.configure(text="Ошибка")
+        print("Connection failure ... ")
+        labelError.configure(text="Нет подключения к серверу ... ")
+    
 
 def buttonGuestClick():
-    try:
-        query = "SELECT username, password FROM users WHERE username = guest'" + "' AND password = guest'" + "'"
-        cur.execute(query)
-        # selectUsers = cur.fetchall()
-        if cur.rowcount == 1:
-            print("Вы вошли в систему! ")
-            labelError.configure(text="Вы вошли в систему! ")
-            ...
-        else:                
-            print("Неверные учетные данные! ") # credential
-            labelError.configure(text="Неверные учетные данные! ")
-    except Exception:
-        labelError.configure(text="Ошибка")
+    username = "guest"
+    password = "guest"
+    ...
+
 
 def buttonRegisterClick():
     ...
@@ -97,24 +111,24 @@ labelError.pack(
 #    Test connection to DB     #
 #                              #
 ################################
-try:
-    conn = pymysql.connect(
-        host = config.host,
-        port = config.port,
-        user = config.user,
-        password = config.password,
-        database = config.database,
-        cursorclass = pymysql.cursors.DictCursor
-    )
-    cur = conn.cursor()
-    cur.execute("select @@version")
-    output = cur.fetchall()
-    print(output)
-    print("Connected successfully! ")
-    conn.close()
-except Exception:
-    print("Connection failure ... ")
-    labelError.configure(text="Нет подключения к серверу ... ")
+# try:
+#     conn = pymysql.connect(
+#         host = config.host,
+#         port = config.port,
+#         user = config.user,
+#         password = config.password,
+#         database = config.database,
+#         cursorclass = pymysql.cursors.DictCursor
+#     )
+#     cur = conn.cursor()
+#     cur.execute("select @@version")
+#     output = cur.fetchall()
+#     print(output)
+#     print("Connected successfully! ")
+#     conn.close()
+# except Exception:
+#     print("Connection failure ... ")
+#     labelError.configure(text="Нет подключения к серверу ... ")
 
 
 formLogin.mainloop()
