@@ -13,9 +13,9 @@ import config
 ##############################
 customtkinter.set_appearance_mode("dark")  # Modes: "System", "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue", "green", "dark-blue"
-WIDTH = HEIGHT = 240
+WIDTH = HEIGHT = 250
 formLogin = customtkinter.CTk()
-formLogin.geometry(f"{WIDTH+100}x{HEIGHT+100}")
+formLogin.geometry(f"{WIDTH+100}x{HEIGHT}")
 formLogin.resizable(False, False)
 formLogin.title("Вход в систему")
 formLogin.eval('tk::PlaceWindow . center')
@@ -61,16 +61,6 @@ def buttonLoginClick():
     except Exception:
         print("Connection failure ... ")
         labelError.configure(text="Нет подключения к серверу ... ")
-    
-
-def buttonGuestClick():
-    username = "guest"
-    password = "guest"
-    ...
-
-
-def buttonRegisterClick():
-    ...
 
 
 ##############################
@@ -84,8 +74,6 @@ labelWelcome = customtkinter.CTkLabel(master=frameLogin, justify=tkinter.CENTER,
 entryUser = customtkinter.CTkEntry(master=frameLogin, width=WIDTH, placeholder_text="Введите логин")
 entryPassword = customtkinter.CTkEntry(master=frameLogin, width=WIDTH, placeholder_text="Введите пароль", show="*")
 buttonLogin = customtkinter.CTkButton(master=frameLogin, text="Войти", width=WIDTH, command = lambda: buttonLoginClick())
-buttonGuest = customtkinter.CTkButton(master=frameLogin, text="Войти как гость", width=WIDTH, command = lambda: buttonGuestClick())
-buttonRegister = customtkinter.CTkButton(master=frameLogin, text="Зарегистрироваться", width=WIDTH, command = lambda: buttonRegisterClick())
 labelError = customtkinter.CTkLabel(master=frameLogin, justify=tkinter.CENTER, width=WIDTH, text="")
 #packing elements
 frameLogin.pack(
@@ -97,10 +85,6 @@ entryUser.pack(
 entryPassword.pack(
     pady=10, padx=10)
 buttonLogin.pack(
-    pady=10, padx=10)
-buttonGuest.pack(
-    pady=10, padx=10)
-buttonRegister.pack(
     pady=10, padx=10)
 labelError.pack(
     pady=10, padx=10)

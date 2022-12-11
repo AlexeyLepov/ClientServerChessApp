@@ -15,7 +15,7 @@ customtkinter.set_appearance_mode("dark")  # Modes: "System", "Dark", "Light"
 customtkinter.set_default_color_theme("green")  # Themes: "blue", "green", "dark-blue"
 WIDTH = HEIGHT = 350
 formRegister = customtkinter.CTk()
-formRegister.geometry(f"{WIDTH+100}x{HEIGHT+100}")
+formRegister.geometry(f"{WIDTH+100}x{HEIGHT}")
 formRegister.resizable(False, False)
 formRegister.title("Регистрация")
 formRegister.eval('tk::PlaceWindow . center')
@@ -31,7 +31,7 @@ def buttonLoginClick():
     ...
 
 def buttonRegisterClick():
-    if entryEmail.get() == "" or entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
+    if entryPassword.get() == "" or entryPasswordRepeat.get() == "" or entryUser.get() == "":
         print("Заполните все поля! ")
         labelError.configure(text="Заполните все поля! ")
     elif entryPassword.get() == entryPasswordRepeat.get():
@@ -54,7 +54,7 @@ def buttonRegisterClick():
             print("Connected successfully! ")
             try:
                 with conn.cursor() as cur:
-                    query = "INSERT INTO `users` (`username`, `email`, `password`, `score`) VALUES ('" + entryUser.get() + "', '" + entryEmail.get() + "', '" + entryPassword.get() + "', '" + str(score) + "');"
+                    query = "INSERT INTO `users` (`username`, `password`, `score`) VALUES ('" + entryUser.get() + "', '" + entryPassword.get() + "', '" + str(score) + "');"
                     cur.execute(query)
                     conn.commit()
                 if cur:
@@ -92,20 +92,16 @@ def buttonRegisterClick():
 frameRegister = customtkinter.CTkFrame(master=formRegister)
 labelWelcome = customtkinter.CTkLabel(master=frameRegister, justify=tkinter.CENTER, width=WIDTH, text="Регистрация")
 entryUser = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите логин")
-entryEmail = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите электронную почту")
 entryPassword = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Введите пароль", show="*")
 entryPasswordRepeat = customtkinter.CTkEntry(master=frameRegister, width=WIDTH, placeholder_text="Подтвердите пароль", show="*")
 comboboxScore = customtkinter.CTkComboBox(frameRegister, width=WIDTH, values=["Новичок", "Любитель", "Мастер"])
 buttonRegister = customtkinter.CTkButton(master=frameRegister, width=WIDTH, text="Зарегистрироваться", command=buttonRegisterClick)
-buttonLogin = customtkinter.CTkButton(master=frameRegister, width=WIDTH, text="Войти (если уже есть аккаунт)", command=buttonLoginClick)
 labelError = customtkinter.CTkLabel(master=frameRegister, width=WIDTH, justify=tkinter.CENTER, text="")
 frameRegister.pack(
     pady=10, padx=10, fill="both", expand=True)
 labelWelcome.pack(
     pady=10, padx=10)
 entryUser.pack(
-    pady=10, padx=10)
-entryEmail .pack(
     pady=10, padx=10)
 entryPassword.pack(
     pady=10, padx=10)
@@ -114,8 +110,6 @@ entryPasswordRepeat.pack(
 comboboxScore.pack(
     pady=12, padx=10)
 buttonRegister.pack(
-    pady=10, padx=10)
-buttonLogin.pack(
     pady=10, padx=10)
 labelError.pack(
     pady=10, padx=10)
