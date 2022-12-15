@@ -47,34 +47,35 @@ class Node:
         c1_5 = 1
         king_advantage = 0
         c1_6 = 10 ** 4
-        board_array = self.board.get_str_arr()
+        #board_array = self.board.get_str_arr()
         piece_arr = self.board.get_piece_arr()
-        for line in board_array:
-            for tile in line:
-                if tile == "BB":
-                    bishop_advantage -= 1
-                elif tile == "BK":
-                    king_advantage -= 1
-                elif tile == "BN":
-                    knight_advantage -= 1
-                elif tile == "BP":
-                    pawn_advantage -= 1
-                elif tile == "BQ":
-                    queen_advantage -= 1
-                elif tile == "BR":
-                    rook_advantage -= 1
-                elif tile == "WB":
-                    bishop_advantage += 1
-                elif tile == "WK":
-                    king_advantage += 1
-                elif tile == "WN":
-                    knight_advantage += 1
-                elif tile == "WP":
-                    pawn_advantage += 1
-                elif tile == "WQ":
-                    queen_advantage += 1
-                elif tile == "WR":
-                    rook_advantage += 1
+        for line in piece_arr:
+            for piece in line:
+                if piece:
+                    if piece.name == "bishop" and piece.color == chessEngine.Color.BLACK:
+                        bishop_advantage -= 1
+                    elif piece.name == "king" and piece.color == chessEngine.Color.BLACK:
+                        king_advantage -= 1
+                    elif piece.name == "knight" and piece.color == chessEngine.Color.BLACK:
+                        knight_advantage -= 1
+                    elif piece.name == "pawn" and piece.color == chessEngine.Color.BLACK:
+                        pawn_advantage -= 1
+                    elif piece.name == "queen" and piece.color == chessEngine.Color.BLACK:
+                        queen_advantage -= 1
+                    elif piece.name == "rook" and piece.color == chessEngine.Color.BLACK:
+                        rook_advantage -= 1
+                    elif piece.name == "bishop" and piece.color == chessEngine.Color.WHITE:
+                        bishop_advantage += 1
+                    elif piece.name == "king" and piece.color == chessEngine.Color.WHITE:
+                        king_advantage += 1
+                    elif piece.name == "knight" and piece.color == chessEngine.Color.WHITE:
+                        knight_advantage += 1
+                    elif piece.name == "pawn" and piece.color == chessEngine.Color.WHITE:
+                        pawn_advantage += 1
+                    elif piece.name == "queen" and piece.color == chessEngine.Color.WHITE:
+                        queen_advantage += 1
+                    elif piece.name == "rook" and piece.color == chessEngine.Color.WHITE:
+                        rook_advantage += 1
         c2_1 = 0.01
         rook_mobility_advantage = 0
         for piece in self.board.pieces:
@@ -244,10 +245,10 @@ class Node:
         self.moves = []
         board_arr = self.board.get_str_arr()
 
-        if self.is_won() != 0 or depth <= -5:
+        if self.is_won() != 0 or depth <= -6:
             return is_white_player*self.get_static_evaluation()
 
-        in_len = len(self.board.interesting_moves())
+
         value = stand_pat
         for move in moves:
             is_capture = False
@@ -268,7 +269,8 @@ class Node:
             n.board = self.board
 
             child_evaluation = is_white_player*n.get_static_evaluation()
-            if (not n.board.check_check(BLACK if n.board.active_color == WHITE else WHITE)) and (n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE) or (is_capture and child_evaluation + delta >= stand_pat)):
+            if is_capture and child_evaluation + delta >= stand_pat:
+            # if (not n.board.check_check(BLACK if n.board.active_color == WHITE else WHITE)) and (n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE) or (is_capture and child_evaluation + delta >= stand_pat)):
                 # if n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE):
                 #
                 #
@@ -452,8 +454,8 @@ class GameTree:
 
 
 def main():
-    # board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
-    board = chessEngine.Board.from_FEN("rnbqkbnr/pppp1ppp/8/4p3/8/8/PPPPPPPP/RNBQKBNR w")
+    board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
+    # board = chessEngine.Board.from_FEN("rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq e3 0 1")
     # board = chessEngine.Board.from_FEN("rnbqkbnr/8/8/8/8/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
@@ -485,7 +487,7 @@ def main():
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
             game_tree = GameTree(board.get_FEN(), True)
-            game_tree.alpha_beta_evaluation(3)
+            game_tree.alpha_beta_evaluation(4)
             move, _ = game_tree.suggest_move()
             print("-----------------------------------------------------")
 
