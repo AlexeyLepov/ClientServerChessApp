@@ -745,6 +745,9 @@ class App(customtkinter.CTk):
         self.ButtonField[0][7].configure(image = None)
         self.ButtonField[7][0].configure(image = None)
         self.ButtonField[7][7].configure(image = None)
+        for i in range(8):
+            for j in range(8):
+                self.ButtonField[i][j].configure(image = None)
         for piece in self.board.pieces:
             position = piece.position
             self.ButtonField[position.row][position.col].configure(image = self.pieceImage(piece.name, piece.color))
