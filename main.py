@@ -274,10 +274,10 @@ class App(customtkinter.CTk):
     WIDTH = 880                             # Setting the Application Window Width
     HEIGHT = 680                            # Setting the Application Window height
     DIMENSION = 8.25                        # dimensions count of the chess board
-    B_WIDTH = B_HEIGHT = 660                # width and height of the chess board
+    B_WIDTH = B_HEIGHT = 650                # width and height of the chess board
     SQ_SIZE = B_HEIGHT / DIMENSION          # the size of each of the sWPquares in the board
     PIECE_DIR = "Assets/PiecesModern/"      # Standard piece Image Folder
-    PIECE_SIZE = 54
+    PIECE_SIZE = 48
     # virtual board
     board = None
     # profile info
@@ -469,12 +469,13 @@ class App(customtkinter.CTk):
         #    Displaying the starting position    #
         #                                        #
         ##########################################
+        
         def displayStartingPosition():
             alphabeticalNumeration = ['a','b','c','d','e','f','g','h']
             self.ButtonField = [[0 for _ in range(8)] for _ in range(8)]
             self.ButtonFieldSign = [[0 for _ in range(2)] for _ in range(8)]
             for i, j in itertools.product(range(8), range(8)):
-                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text="", hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
+                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text=" ",anchor="e", font=("Arial Narrow", 1), hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
                 self.ButtonField[i][j].grid(row=7-i, column=j+1, sticky="sw", padx=0, pady=0)
             for i, j in itertools.product(range(8), range(2)):
                 if j==0:
@@ -488,6 +489,9 @@ class App(customtkinter.CTk):
             self.UpdateBoard()
             for i, j in itertools.product(range(8), range(8)):
                 self.ButtonField[i][j].configure(command = lambda row=i,col=j: self.ButtonField_event(row,col))
+            for i, j in itertools.product(range(8), range(8)):
+                self.ButtonField[i][j].bind("<Enter>", lambda event,row=i,col=j: self.onhover(event,row,col), add='+')
+                self.ButtonField[i][j].bind("<Leave>", lambda event,row=i,col=j: self.onleave(event,row,col), add='+')
         displayStartingPosition()
         ##################################
         #                                #
@@ -673,6 +677,12 @@ class App(customtkinter.CTk):
     #    Functions for pressing buttons - chess fields    #
     #                                                     #
     #######################################################
+    def onleave(self,event,row,col):
+        self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
+        self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
+    def onhover(self,event,row,col):
+        self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
+        self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
     def ButtonField_event(self,row,col):
         ''' Some of the functions from chessEngine.py used:
         correct_moves - list of moves that a piece can operate on - except for those in which it is possible to capture the enemy
