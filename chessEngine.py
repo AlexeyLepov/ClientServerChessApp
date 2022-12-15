@@ -481,15 +481,16 @@ class Board:
         Returns:
             bool: True if the player is in check, False otherwise
         """
+        king_pos = None
         for piece in self.pieces:
             if piece.color == color and piece.name == "king":
                 king_pos = piece.position
                 break
-
-        for piece in self.pieces:
-            if piece.color != color:
-                if king_pos in piece.get_captures(self.arr):
-                    return True
+        if king_pos is not None:
+            for piece in self.pieces:
+                if piece.color != color:
+                    if king_pos in piece.correct_captures(self.arr,None):
+                        return True
         return False
 
     def move_piece(self, piece, new_pos):
