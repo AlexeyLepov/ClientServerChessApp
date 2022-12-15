@@ -1,8 +1,11 @@
 import chessEngine
 import copy
+BLACK = chessEngine.Color.BLACK
+WHITE = chessEngine.Color.WHITE
 
 counter = 0
-
+t_table = dict()
+mmax = 0
 
 class Node:
     def __init__(self, fen_notation: str, is_white: bool):
@@ -145,6 +148,7 @@ class Node:
 
     def alpha_beta_evaluation(self, depth, alpha, beta, is_white_player, last_tile) -> float:
         global counter
+        global t_table
         counter += 1
         if counter % 10000 == 0:
             print(counter)
@@ -154,7 +158,6 @@ class Node:
             return is_white_player * self.get_static_evaluation()
         if depth <= 0:
             return self.quiscence_search(0,alpha,beta,is_white_player,is_white_player*self.get_static_evaluation())
-            return self.get_static_exchange_evaluation(0, alpha, beta, is_white_player, last_tile)
 
         self.moves = self.board.all_moves()
 
@@ -165,7 +168,15 @@ class Node:
             n.board = self.board
             self.children.append(n)
 
-            self.evaluation: float = - n.alpha_beta_evaluation(depth - 1, -beta, -alpha, -is_white_player, move[1])
+            try:
+                entry = t_table[n.fen]
+                t_a, t_b, t_val, t_age = entry[0], entry[1], entry[2], entry[3]
+            except KeyError:
+                t_a, t_b, t_val, t_age = None, None, None, None
+            if t_val is None:
+                self.evaluation: float = - n.alpha_beta_evaluation(depth - 1, -beta, -alpha, -is_white_player, move[1])
+            else:
+                self.evaluation = -t_val
             value = max(value, self.evaluation)
             alpha = max(alpha, value)
             self.move_reverse(self.board, move)
@@ -181,6 +192,15 @@ class Node:
         #     print("  a  b  c  d  e  f  g  h")
         #
         #     raise Exception
+
+        try:
+            entry = t_table[self.fen]
+            t_a,t_b,t_val,t_age = entry[0],entry[1],entry[2],entry[3]
+
+            t_table[self.fen] = (max(t_a,alpha),min(t_b,beta),max(t_val,self.evaluation),counter)
+        except KeyError:
+            t_table[self.fen] = (alpha, beta, self.evaluation,counter)
+
         return value
 
     def move_straight(self, board: chessEngine.Board, move):
@@ -226,27 +246,70 @@ class Node:
         raise Exception
 
     def quiscence_search(self, depth: int, alpha: float, beta: float, is_white_player, stand_pat: float):
-        global counter
+        global counter,mmax
+        if mmax>depth:
+            print("max: ",mmax)
+            mmax = depth
         counter += 1
         if counter % 10000 == 0:
             print(counter, "q")
         delta = 2
         self.board: chessEngine.Board
-        self.moves = self.board.interesting_moves()
+        moves = self.board.all_moves()
+        self.moves = []
+        board_arr = self.board.get_str_arr()
 
-        if len(self.moves) == 0 or self.is_won() != 0:
+        if self.is_won() != 0 or depth <= -5:
             return is_white_player*self.get_static_evaluation()
 
-
+        in_len = len(self.board.interesting_moves())
         value = stand_pat
-        for move in self.moves:
+        for move in moves:
+            is_capture = False
+            f_pos = board_arr[move[0][0]][move[0][1]]
+            s_pos = board_arr[move[1][0]][move[1][1]]
+            if (f_pos[0] !=" ") and (s_pos[0] !=" ") and (f_pos[0] != s_pos[0]):
+                # arr = board_arr
+                # print(
+                #     f"color: {self.board.active_color}, W: {self.board.score[chessEngine.Color.WHITE]}, B: {self.board.score[chessEngine.Color.BLACK]}")
+                # for n_, i in enumerate(arr):
+                #     print(8 - n_, *i)
+                # print("  a  b  c  d  e  f  g  h")
+                # print("("+f_pos+")"+" "+"("+s_pos+")")
+                # print(move)
+                is_capture = True
             self.move_straight(self.board,move)
             n = Node(self.board.get_FEN(),not self.is_white)
             n.board = self.board
+
             child_evaluation = is_white_player*n.get_static_evaluation()
-            if child_evaluation + delta >= stand_pat:
+            if (not n.board.check_check(BLACK if n.board.active_color == WHITE else WHITE)) and (n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE) or (is_capture and child_evaluation + delta >= stand_pat)):
+                # if n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE):
+                #
+                #
+                #     arr = board_arr
+                #     print(
+                #         f"color: {n.board.active_color}, W: {n.board.score[chessEngine.Color.WHITE]}, B: {n.board.score[chessEngine.Color.BLACK]}")
+                #     for n_, i in enumerate(arr):
+                #         print(8 - n_, *i)
+                #     print("  a  b  c  d  e  f  g  h")
+
+
                 self.children.append(n)
-                self.evaluation = -n.quiscence_search(depth-1,-beta,-alpha,-is_white_player,-child_evaluation)
+                self.moves.append(move)
+
+
+                try:
+                    entry = t_table[n.fen]
+                    t_a,t_b,t_val,t_age = entry[0],entry[1],entry[2],entry[3]
+                except KeyError:
+                    t_a,t_b,t_val,t_age = None,None,None,None
+                if t_val is None:
+                    self.evaluation = -n.quiscence_search(depth-1,-beta,-alpha,-is_white_player,-child_evaluation)
+                else:
+                    self.evaluation = -t_val
+
+
                 value = max(self.evaluation,value)
                 alpha = max(alpha,value)
 
@@ -255,6 +318,27 @@ class Node:
                 self.evaluation = value
                 break
         self.evaluation = value
+
+        try:
+            entry = t_table[self.fen]
+            t_a,t_b,t_val,t_age = entry[0],entry[1],entry[2],entry[3]
+
+            t_table[self.fen] = (max(t_a,alpha),min(t_b,beta),max(t_val,self.evaluation),counter)
+        except KeyError:
+            t_table[self.fen] = (alpha, beta, self.evaluation,counter)
+
+
+        #print(in_len,len(self.moves))
+        # if len(self.moves) >=20:
+        #     arr = board_arr
+        #     print(
+        #         f"color: {self.board.active_color}, W: {self.board.score[chessEngine.Color.WHITE]}, B: {self.board.score[chessEngine.Color.BLACK]}")
+        #     for n_, i in enumerate(arr):
+        #         print(8 - n_, *i)
+        #     print("  a  b  c  d  e  f  g  h")
+        #     for move in self.moves:
+        #         print(move)
+        #     raise Exception
         return value
 
     def get_static_exchange_evaluation(self, depth: int, alpha: float, beta: float, is_white_player, exch_tile):
@@ -333,6 +417,8 @@ class GameTree:
         return self.evaluation
 
     def suggest_move(self, depth=None):
+        global t_table
+        t_table.clear()
         self.evaluation = 10 ** 9
         move = None
         child = None
@@ -389,7 +475,7 @@ def main():
     # board = Board.from_FEN("1n2kbnr/8/8/8/2PKPPbP/8/8/8 b KQkq e3 0 1")
     # board = Board.from_FEN("1n2kbnr/8/8/8/2PPPPbP/8/8/8 b KQkq e3 0 1")
     # board = chessEngine.Board.from_FEN("rnbqkbnr/8/8/8/8/8/8/K7 w KQkq e3 0 1")
-    # board = chessEngine.Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
+    #board = chessEngine.Board.from_FEN("2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w KQkq - 0 1")
     arr = board.get_str_arr()
     print(arr)
     print(board.get_FEN())
@@ -414,7 +500,7 @@ def main():
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
             game_tree = GameTree(board.get_FEN(), True)
-            game_tree.alpha_beta_evaluation(4)
+            game_tree.alpha_beta_evaluation(3)
             move, _ = game_tree.suggest_move()
             print("-----------------------------------------------------")
 
