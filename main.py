@@ -273,9 +273,9 @@ class App(customtkinter.CTk):
     ######################################################################
     WIDTH = 880                             # Setting the Application Window Width
     HEIGHT = 680                            # Setting the Application Window height
-    DIMENSION = 9                           # dimensions count of the chess board
+    DIMENSION = 8.25                        # dimensions count of the chess board
     B_WIDTH = B_HEIGHT = 660                # width and height of the chess board
-    SQ_SIZE = B_HEIGHT // DIMENSION         # the size of each of the sWPquares in the board
+    SQ_SIZE = B_HEIGHT / DIMENSION          # the size of each of the sWPquares in the board
     PIECE_DIR = "Assets/PiecesModern/"      # Standard piece Image Folder
     PIECE_SIZE = 54
     # virtual board
@@ -292,6 +292,8 @@ class App(customtkinter.CTk):
         Moving_Piece = "#87a937"                # The color of the selected piece
         Users_Current = chessEngine.Color.WHITE # Player Color
         Menu_Button = "#6a994e"
+        Signs = "#2b2d42"
+        HighlightedSigns = "#013a63"
     # selected button class
     class SelectedButtonField:
         selected = False
@@ -427,7 +429,7 @@ class App(customtkinter.CTk):
         self.frame_playClient.columnconfigure(0, weight=1)
         # Adding elements to the form
         self.frame_chessClient = customtkinter.CTkFrame(master=self.frame_playClient, width=App.B_WIDTH, height=App.B_HEIGHT, fg_color=("#D1D5D8","#2A2D2E"))
-        self.frame_board = customtkinter.CTkFrame(master=self.frame_chessClient, fg_color=(App.Colors.Board_White, App.Colors.Board_Black), width=App.B_WIDTH, height=App.B_HEIGHT)
+        self.frame_board = customtkinter.CTkFrame(master=self.frame_chessClient, fg_color=(App.Colors.Signs, App.Colors.Signs), width=App.B_WIDTH, height=App.B_HEIGHT)
         # Packing elements
         self.frame_chessClient.grid(
             row=0, column=0, padx=0, pady=0, sticky="nswe")
@@ -476,10 +478,10 @@ class App(customtkinter.CTk):
                 self.ButtonField[i][j].grid(row=7-i, column=j+1, sticky="sw", padx=0, pady=0)
             for i, j in itertools.product(range(8), range(2)):
                 if j==0:
-                    self.ButtonFieldSign[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE/4, text=f"{alphabeticalNumeration[i]}", hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
+                    self.ButtonFieldSign[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE/4, text=f"{alphabeticalNumeration[i]}", hover_color=(App.Colors.Signs,App.Colors.Signs), fg_color=(App.Colors.Signs,App.Colors.Signs))
                     self.ButtonFieldSign[i][j].grid(row=8-j, column=i+1, sticky="sw", padx=0, pady=0)
                 else:
-                    self.ButtonFieldSign[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE/4, height=App.SQ_SIZE, text=f"{i+1}", hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
+                    self.ButtonFieldSign[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE/4, height=App.SQ_SIZE, text=f"{i+1}", hover_color=(App.Colors.Signs,App.Colors.Signs), fg_color=(App.Colors.Signs,App.Colors.Signs))
                     self.ButtonFieldSign[i][j].grid(row=7-i, column=0, sticky="sw", padx=0, pady=0)
             self.RecolorBoard()
             self.board = chessEngine.Board()
