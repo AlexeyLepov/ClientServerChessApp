@@ -1,6 +1,6 @@
 import chessEngine
 import copy
-import board_pieces_tables
+import bpt
 BLACK = chessEngine.Color.BLACK
 WHITE = chessEngine.Color.WHITE
 
@@ -71,55 +71,55 @@ class Node:
                 if piece.name == "bishop" and piece.color == chessEngine.Color.BLACK:
                     bb += 1
                     bishop_advantage -= 1
-                    evaluation -= board_pieces_tables.BISHOPS_TABLE[piece.position.row][7-piece.position.col]
+                    evaluation -= bpt.BISHOPS_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "knight" and piece.color == chessEngine.Color.BLACK:
                     bn += 1
                     knight_advantage -= 1
-                    evaluation -= board_pieces_tables.KNIGHTS_TABLE[piece.position.row][7-piece.position.col]
+                    evaluation -= bpt.KNIGHTS_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "pawn" and piece.color == chessEngine.Color.BLACK:
                     bp += 1
                     pawn_advantage -= 1
-                    evaluation -= board_pieces_tables.PAWN_TABLE[piece.position.row][7-piece.position.col]
+                    evaluation -= bpt.PAWN_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "queen" and piece.color == chessEngine.Color.BLACK:
                     bq += 1
                     queen_advantage -= 1
-                    evaluation -= board_pieces_tables.QUEENS_TABLE[piece.position.row][7-piece.position.col]
+                    evaluation -= bpt.QUEENS_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "rook" and piece.color == chessEngine.Color.BLACK:
                     br += 1
                     rook_advantage -= 1
-                    evaluation -= board_pieces_tables.ROOKS_TABLE[7-piece.position.row][7-piece.position.col]
+                    evaluation -= bpt.ROOKS_TABLE[7-piece.position.row][7-piece.position.col]
                 elif piece.name == "bishop" and piece.color == chessEngine.Color.WHITE:
                     wb += 1
                     bishop_advantage += 1
-                    evaluation += board_pieces_tables.BISHOPS_TABLE[7-piece.position.row][piece.position.col]
+                    evaluation += bpt.BISHOPS_TABLE[7-piece.position.row][piece.position.col]
                 elif piece.name == "knight" and piece.color == chessEngine.Color.WHITE:
                     wn += 1
                     knight_advantage += 1
-                    evaluation += board_pieces_tables.KNIGHTS_TABLE[7-piece.position.row][piece.position.col]
+                    evaluation += bpt.KNIGHTS_TABLE[7-piece.position.row][piece.position.col]
                 elif piece.name == "pawn" and piece.color == chessEngine.Color.WHITE:
                     wp += 1
                     pawn_advantage += 1
-                    evaluation += board_pieces_tables.PAWN_TABLE[7-piece.position.row][piece.position.col]
+                    evaluation += bpt.PAWN_TABLE[7-piece.position.row][piece.position.col]
                 elif piece.name == "queen" and piece.color == chessEngine.Color.WHITE:
                     wq += 1
                     queen_advantage += 1
-                    evaluation += board_pieces_tables.QUEENS_TABLE[7-piece.position.row][piece.position.col]
+                    evaluation += bpt.QUEENS_TABLE[7-piece.position.row][piece.position.col]
                 elif piece.name == "rook" and piece.color == chessEngine.Color.WHITE:
                     wr += 1
                     rook_advantage += 1
-                    evaluation += board_pieces_tables.ROOKS_TABLE[7-piece.position.row][piece.position.col]
+                    evaluation += bpt.ROOKS_TABLE[7-piece.position.row][piece.position.col]
                 elif piece.name == "king" and piece.color == chessEngine.Color.BLACK:
                     king_advantage -= 1
                     if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1):
-                        evaluation -= board_pieces_tables.KINGS_ENDGAME_TABLE[piece.position.row][7-piece.position.col]
+                        evaluation -= bpt.KINGS_ENDGAME_TABLE[piece.position.row][7-piece.position.col]
                     else:
-                        evaluation -= board_pieces_tables.KINGS_TABLE[piece.position.row][7-piece.position.col]
+                        evaluation -= bpt.KINGS_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "king" and piece.color == chessEngine.Color.WHITE:
                     king_advantage += 1
                     if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1):
-                        evaluation += board_pieces_tables.KINGS_ENDGAME_TABLE[7-piece.position.row][7-piece.position.col]
+                        evaluation += bpt.KINGS_ENDGAME_TABLE[7-piece.position.row][7-piece.position.col]
                     else:
-                        evaluation += board_pieces_tables.KINGS_TABLE[7-piece.position.row][7-piece.position.col]
+                        evaluation += bpt.KINGS_TABLE[7-piece.position.row][7-piece.position.col]
         # c2_1 = 0.01
         # rook_mobility_advantage = 0
         # for piece in self.board.pieces:
