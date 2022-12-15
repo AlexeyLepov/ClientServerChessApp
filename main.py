@@ -20,7 +20,7 @@ from types import CellType
 from PIL import Image
 
 # importing local files
-import config
+#import config
 import chessEngine
 import chessLogic
 

@@ -244,7 +244,7 @@ class Node:
         self.moves = []
         board_arr = self.board.get_str_arr()
 
-        if self.is_won() != 0 or depth <= -5:
+        if self.is_won() != 0 or depth <= -6:
             return is_white_player*self.get_static_evaluation()
 
 
@@ -268,7 +268,8 @@ class Node:
             n.board = self.board
 
             child_evaluation = is_white_player*n.get_static_evaluation()
-            if (not n.board.check_check(BLACK if n.board.active_color == WHITE else WHITE)) and (n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE) or (is_capture and child_evaluation + delta >= stand_pat)):
+            if is_capture and child_evaluation + delta >= stand_pat:
+            # if (not n.board.check_check(BLACK if n.board.active_color == WHITE else WHITE)) and (n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE) or (is_capture and child_evaluation + delta >= stand_pat)):
                 # if n.board.check_check(BLACK if n.board.active_color == BLACK else WHITE):
                 #
                 #
