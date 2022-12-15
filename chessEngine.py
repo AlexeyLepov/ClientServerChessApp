@@ -534,7 +534,8 @@ class Board:
             self.arr[new_pos.row][new_pos.col] = None
             self.pieces.remove(eaten_piece)
             self.score[piece.color] += eaten_piece.value
-
+            piece.first_move = False
+            
             piece.position = new_pos
             self.arr = self.get_piece_arr()
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
