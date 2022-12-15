@@ -20,7 +20,7 @@ from types import CellType
 from PIL import Image
 
 # importing local files
-#import config
+import config
 import chessEngine
 import chessLogic
 
@@ -85,7 +85,7 @@ class FormLogin(customtkinter.CTk):
                         App.USERNAME = entryUser.get()
                         App.PASSWORD = entryPassword.get()
                         print(f"Вы вошли в систему как {entryUser.get()}! ")
-                        labelError.configure(text="Вы вошли в систему! ")
+                        labelError.configure(text="Вход в систему выполнен! ")
                     else:
                         print("Неверные учетные данные! ") # credential
                         labelError.configure(text="Неверные учетные данные! ")
@@ -448,6 +448,8 @@ class App(customtkinter.CTk):
         self.frame_profileInfo = customtkinter.CTkLabel(master=self.frame_profile, height=100, fg_color=("#C0C2C5","#343638"))
         self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
         self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
+        self.frame_profileButtonLogout = customtkinter.CTkButton(master=self.frame_profile, text="Выйти", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogout_event)
+        self.frame_profileButtonPlay = customtkinter.CTkButton(master=self.frame_profile, text="Играть", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonPlay_event)
         # Packing elements
         self.frame_profileInfo.grid(
             row=0, column=0, sticky="nswe", padx=5, pady=5)
@@ -475,7 +477,7 @@ class App(customtkinter.CTk):
             self.ButtonField = [[0 for _ in range(8)] for _ in range(8)]
             self.ButtonFieldSign = [[0 for _ in range(2)] for _ in range(8)]
             for i, j in itertools.product(range(8), range(8)):
-                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text=" ",anchor="e", font=("Arial Narrow", 1), hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
+                self.ButtonField[i][j] = customtkinter.CTkButton(master=self.frame_board, width=App.SQ_SIZE, height=App.SQ_SIZE, text="", hover_color=(App.Colors.Field_Correct_Move,App.Colors.Field_Correct_Move))
                 self.ButtonField[i][j].grid(row=7-i, column=j+1, sticky="sw", padx=0, pady=0)
             for i, j in itertools.product(range(8), range(2)):
                 if j==0:
@@ -489,9 +491,9 @@ class App(customtkinter.CTk):
             self.UpdateBoard()
             for i, j in itertools.product(range(8), range(8)):
                 self.ButtonField[i][j].configure(command = lambda row=i,col=j: self.ButtonField_event(row,col))
-            for i, j in itertools.product(range(8), range(8)):
-                self.ButtonField[i][j].bind("<Enter>", lambda event,row=i,col=j: self.onhover(event,row,col), add='+')
-                self.ButtonField[i][j].bind("<Leave>", lambda event,row=i,col=j: self.onleave(event,row,col), add='+')
+            # for i, j in itertools.product(range(8), range(8)):
+            #     self.ButtonField[i][j].bind("<Enter>", lambda event,row=i,col=j: self.onhover(event,row,col), add='+')
+            #     self.ButtonField[i][j].bind("<Leave>", lambda event,row=i,col=j: self.onleave(event,row,col), add='+')
         displayStartingPosition()
         ##################################
         #                                #
@@ -535,8 +537,6 @@ class App(customtkinter.CTk):
                     self.frame_profileInfo.configure(text=f"Добро пожаловать, {App.USERNAME}!")
                     print(f"Добро пожаловать, {App.USERNAME}!")
                     self.frame_profileButtonLogin.configure(text="Выйти", command=self.frame_profileButtonLogout)
-
-                    
                     self.frame_profileButtonLogin.grid(
                         row=1, column=0, sticky="nswe", padx=5, pady=5)
                     self.frame_profileButtonReg.grid(
@@ -658,8 +658,13 @@ class App(customtkinter.CTk):
         App.withdraw(self)
         form_reg = FormRegister()
         form_reg.startRegForm()
-    def frame_profileButtonLogout(self):
-        self.frame_profileButtonLogin.configure(text="Войти",command=self.frame_profileButtonLogin_event)
+    def frame_profileButtonLogout_event(self):
+        self.frame_profileButtonLogout.grid(
+            row=3, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonPlay.grid(
+            row=4, column=0, sticky="nswe", padx=5, pady=5)
+    def frame_profileButtonPlay_event(self):
+        ...
 
 
         
@@ -677,12 +682,12 @@ class App(customtkinter.CTk):
     #    Functions for pressing buttons - chess fields    #
     #                                                     #
     #######################################################
-    def onleave(self,event,row,col):
-        self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
-        self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
-    def onhover(self,event,row,col):
-        self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
-        self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
+    # def onleave(self,event,row,col):
+    #     self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
+    #     self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.Signs,App.Colors.Signs))
+    # def onhover(self,event,row,col):
+    #     self.ButtonFieldSign[col][0].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
+    #     self.ButtonFieldSign[row][1].configure(fg_color=(App.Colors.HighlightedSigns,App.Colors.HighlightedSigns))
     def ButtonField_event(self,row,col):
         ''' Some of the functions from chessEngine.py used:
         correct_moves - list of moves that a piece can operate on - except for those in which it is possible to capture the enemy
