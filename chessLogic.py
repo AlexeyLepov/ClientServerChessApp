@@ -486,7 +486,7 @@ def main():
             print(board.move_piece(board.arr[first_pos.row][first_pos.col], last_pos))
         else:
             game_tree = GameTree(board.get_FEN(), True)
-            game_tree.alpha_beta_evaluation(3)
+            game_tree.alpha_beta_evaluation(4)
             move, _ = game_tree.suggest_move()
             print("-----------------------------------------------------")
 
