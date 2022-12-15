@@ -134,14 +134,14 @@ class Piece:
                 if self.position.row != 7 and board_arr[self.position.row + 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row + 1, self.position.col))
-                if self.position.row == 1 and board_arr[self.position.row + 2][self.position.col] == None:
+                if self.position.row == 1 and board_arr[self.position.row + 2][self.position.col] == None and board_arr[self.position.row + 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row + 2, self.position.col))
             if self.color == Color.BLACK:
                 if self.position.row != 0 and board_arr[self.position.row - 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row - 1, self.position.col))
-                if self.position.row == 6 and board_arr[self.position.row - 2][self.position.col] == None:
+                if self.position.row == 6 and board_arr[self.position.row - 2][self.position.col] and board_arr[self.position.row - 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row - 2, self.position.col))
 
@@ -233,6 +233,7 @@ class Piece:
                             board_arr[self.position.row + i][self.position.col + j].color != self.color):
                         moves.append(
                             Position(self.position.row + i, self.position.col + j))
+                        
             if self.color == Color.WHITE and self.first_move:
                 if board_arr[0][3] == None and board_arr[0][2] == None and board_arr[0][1] == None and board_arr[0][
                     0] != None and board_arr[0][0].name == "rook" and board_arr[0][0].first_move:
@@ -248,12 +249,6 @@ class Piece:
                     7].name == "rook" and board_arr[7][7].first_move:
                     moves.append(Position(7, 6))
                     
-        return moves
-
-        # for move in moves:
-        #    move.col -= 1
-        #    move.row -= 1
-
         return moves
 
     def correct_captures(self, board_arr, prev_board_arr):
@@ -566,7 +561,7 @@ class Board:
         """
         Returns a text 2d array of the board
         """
-        arr = [["  " if (i + j) % 2 == 1 else "  " for i in range(8)]
+        arr = [["  " for i in range(8)]
                for j in range(8)]
         for piece in self.pieces:
             arr[7 - piece.position.row][piece.position.col] = {Color.BLACK: "B", Color.WHITE: "W"}[piece.color] + {
