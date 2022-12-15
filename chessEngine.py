@@ -555,11 +555,9 @@ class Board:
         """
         Returns a text 2d array of the board
         """
-        arr = [["  " for i in range(8)]
-               for j in range(8)]
+        arr = [["  " for i in range(8)] for j in range(8)]
         for piece in self.pieces:
             arr[7 - piece.position.row][piece.position.col] = {Color.BLACK: "B", Color.WHITE: "W"}[piece.color] + {
-
                 "pawn": "P", "rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K"}[piece.name]
         return arr
 

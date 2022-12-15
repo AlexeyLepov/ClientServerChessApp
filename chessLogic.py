@@ -47,34 +47,35 @@ class Node:
         c1_5 = 1
         king_advantage = 0
         c1_6 = 10 ** 4
-        board_array = self.board.get_str_arr()
+        #board_array = self.board.get_str_arr()
         piece_arr = self.board.get_piece_arr()
-        for line in board_array:
-            for tile in line:
-                if tile == "BB":
-                    bishop_advantage -= 1
-                elif tile == "BK":
-                    king_advantage -= 1
-                elif tile == "BN":
-                    knight_advantage -= 1
-                elif tile == "BP":
-                    pawn_advantage -= 1
-                elif tile == "BQ":
-                    queen_advantage -= 1
-                elif tile == "BR":
-                    rook_advantage -= 1
-                elif tile == "WB":
-                    bishop_advantage += 1
-                elif tile == "WK":
-                    king_advantage += 1
-                elif tile == "WN":
-                    knight_advantage += 1
-                elif tile == "WP":
-                    pawn_advantage += 1
-                elif tile == "WQ":
-                    queen_advantage += 1
-                elif tile == "WR":
-                    rook_advantage += 1
+        for line in piece_arr:
+            for piece in line:
+                if piece:
+                    if piece.name == "bishop" and piece.color == chessEngine.Color.BLACK:
+                        bishop_advantage -= 1
+                    elif piece.name == "king" and piece.color == chessEngine.Color.BLACK:
+                        king_advantage -= 1
+                    elif piece.name == "knight" and piece.color == chessEngine.Color.BLACK:
+                        knight_advantage -= 1
+                    elif piece.name == "pawn" and piece.color == chessEngine.Color.BLACK:
+                        pawn_advantage -= 1
+                    elif piece.name == "queen" and piece.color == chessEngine.Color.BLACK:
+                        queen_advantage -= 1
+                    elif piece.name == "rook" and piece.color == chessEngine.Color.BLACK:
+                        rook_advantage -= 1
+                    elif piece.name == "bishop" and piece.color == chessEngine.Color.WHITE:
+                        bishop_advantage += 1
+                    elif piece.name == "king" and piece.color == chessEngine.Color.WHITE:
+                        king_advantage += 1
+                    elif piece.name == "knight" and piece.color == chessEngine.Color.WHITE:
+                        knight_advantage += 1
+                    elif piece.name == "pawn" and piece.color == chessEngine.Color.WHITE:
+                        pawn_advantage += 1
+                    elif piece.name == "queen" and piece.color == chessEngine.Color.WHITE:
+                        queen_advantage += 1
+                    elif piece.name == "rook" and piece.color == chessEngine.Color.WHITE:
+                        rook_advantage += 1
         c2_1 = 0.01
         rook_mobility_advantage = 0
         for piece in self.board.pieces:
