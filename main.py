@@ -171,13 +171,13 @@ class FormRegister(customtkinter.CTk):
                 print("Заполните все поля! ")
                 labelError.configure(text="Заполните все поля! ")
             elif entryPassword.get() == entryPasswordRepeat.get():
-                score = 1000
+                score = 800 
                 if comboboxScore.get() == "Новичок":
-                    score = 600
+                    score = 500
                 elif comboboxScore.get() == "Любитель":
                     score = 1000
                 elif comboboxScore.get() == "Мастер":
-                    score = 1400
+                    score = 2000
                 try:
                     conn = pymysql.connect(
                         host = config.host,
@@ -271,16 +271,17 @@ class App(customtkinter.CTk):
     #    Setting the parameters and the class for working with colors    #
     #                                                                    #
     ######################################################################
-    WIDTH = 1160                            # Setting the Application Window Width
+    WIDTH = 880                           # Setting the Application Window Width
     HEIGHT = 680                            # Setting the Application Window height
     DIMENSION = 8                           # dimensions count of the chess board
-    B_WIDTH = B_HEIGHT = 560                # width and height of the chess board
+    B_WIDTH = B_HEIGHT = 660                # width and height of the chess board
     SQ_SIZE = B_HEIGHT // DIMENSION         # the size of each of the sWPquares in the board
     PIECE_DIR = "Assets/PiecesModern/"      # Standard piece Image Folder
+    PIECE_SIZE = 60
     # virtual board
     board = None
     # profile info
-    global USERNAME 
+    global USERNAME
     global PASSWORD
     # color class
     class Colors:
@@ -317,18 +318,18 @@ class App(customtkinter.CTk):
             self.bind("<Command-w>", self.on_closing)
             self.createcommand('tk::mac::Quit', self.on_closing)
         # Reading the image of pieces and "fitting" to the size of one cell of the virtual chessboard
-        self.BB = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bB.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bB.png')), size=(54,54))
-        self.BP = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bp.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bp.png')), size=(54,54))
-        self.BN = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bN.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bN.png')), size=(54,54))
-        self.BR = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bR.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bR.png')), size=(54,54))
-        self.BQ = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bQ.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bQ.png')), size=(54,54))
-        self.BK = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bK.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bK.png')), size=(54,54))
-        self.WB = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wB.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wB.png')), size=(54,54))
-        self.WP = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wp.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wp.png')), size=(54,54))
-        self.WN = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wN.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wN.png')), size=(54,54))
-        self.WR = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wR.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wR.png')), size=(54,54))
-        self.WQ = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wQ.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wQ.png')), size=(54,54))
-        self.WK = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wK.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wK.png')), size=(54,54))
+        self.BB = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bB.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bB.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.BP = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bp.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bp.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.BN = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bN.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bN.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.BR = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bR.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bR.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.BQ = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bQ.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bQ.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.BK = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'bK.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'bK.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WB = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wB.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wB.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WP = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wp.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wp.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WN = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wN.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wN.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WR = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wR.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wR.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WQ = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wQ.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wQ.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
+        self.WK = customtkinter.CTkImage(light_image=Image.open(os.path.join(App.PIECE_DIR, 'wK.png')), dark_image=Image.open(os.path.join(App.PIECE_DIR, 'wK.png')), size=(App.PIECE_SIZE,App.PIECE_SIZE))
         ##########################
         #                        #
         #    Connecting to DB    #
@@ -374,7 +375,7 @@ class App(customtkinter.CTk):
         self.frame_menu.grid_rowconfigure(11, minsize=10)
         # Adding elements to the menu
         self.label_menu = customtkinter.CTkLabel(master=self.frame_menu, text="МЕНЮ", font=("Roboto Medium", -16)) # Label
-        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Играть", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_playClient_event)
+        self.button_playClient = customtkinter.CTkButton(master=self.frame_menu, text="Тренироваться", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_playClient_event)
         self.button_profile = customtkinter.CTkButton(master=self.frame_menu, text="Профиль", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_profile_event)
         self.button_info = customtkinter.CTkButton(master=self.frame_menu, text="О программе", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.button_info_event)
         self.switch_dark_theme = customtkinter.CTkSwitch(master=self.frame_menu, text="Темная тема", command=self.change_theme_mode) # Dark theme switcher
@@ -426,21 +427,12 @@ class App(customtkinter.CTk):
         self.frame_playClient.columnconfigure(0, weight=1)
         # Adding elements to the form
         self.frame_chessClient = customtkinter.CTkFrame(master=self.frame_playClient, width=App.B_WIDTH, height=App.B_HEIGHT, fg_color=("#D1D5D8","#2A2D2E"))
-        self.frame_chat = customtkinter.CTkFrame(master=self.frame_playClient, width=365, height=App.B_HEIGHT, fg_color=("#C0C2C5","#343638"))
-        self.frame_top_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, text="", fg_color=("#C0C2C5","#343638"))
         self.frame_board = customtkinter.CTkFrame(master=self.frame_chessClient, fg_color=(App.Colors.Board_White, App.Colors.Board_Black), width=App.B_WIDTH, height=App.B_HEIGHT)
-        self.frame_bottom_timeClient = customtkinter.CTkLabel(master=self.frame_chessClient, height=40, text="",  fg_color=("#C0C2C5","#343638"))
         # Packing elements
         self.frame_chessClient.grid(
             row=0, column=0, padx=0, pady=0, sticky="nswe")
-        self.frame_chat.grid(
-            row=0, column=1, padx=5, pady=5, sticky="nswe")
-        self.frame_top_timeClient.grid(
-            row=0, column=0, padx=5, pady=5, sticky="nswe")
         self.frame_board.grid(
             row=1, column=0, padx=5, pady=0, sticky="nswe")
-        self.frame_bottom_timeClient.grid(
-            row=2, column=0, padx=5, pady=5, sticky="nswe")
         ###################################
         #                                 #
         #    Creating a profile frame     #
@@ -694,7 +686,7 @@ class App(customtkinter.CTk):
         piece = self.board.get_piece_arr()[position.row][position.col]
         if self.board.move_piece(piece, chessEngine.Position(row, col)):
             game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
-            game_tree.alpha_beta_evaluation(5)
+            game_tree.alpha_beta_evaluation(3)
             move,_ = game_tree.suggest_move()
             self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
             self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
