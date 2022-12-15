@@ -607,9 +607,6 @@ class Board:
         for piece in self.pieces:
             moves = piece.correct_moves(piece_array,None)
             captures = piece.correct_captures(piece_array,None)
-            # for move in moves:
-            #     for capt in captures:
-            #         if
             for move in captures:
                 if self.active_color == Color.WHITE and piece.color == Color.WHITE:
                     capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])

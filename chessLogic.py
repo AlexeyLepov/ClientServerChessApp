@@ -79,60 +79,45 @@ class Node:
         rook_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "rook":
+                cm = piece.correct_moves(piece_arr, None)
+                cc = piece.correct_captures(piece_arr, None)
                 if piece.color == chessEngine.Color.WHITE:
-                    for _ in piece.correct_moves(piece_arr, None):
-                        rook_mobility_advantage += 1
-                    for _ in piece.correct_captures(piece_arr, None):
-                        rook_mobility_advantage += 1
+                    rook_mobility_advantage += len(cm) + len(cc)
                 else:
-                    for _ in piece.correct_moves(piece_arr, None):
-                        rook_mobility_advantage -= 1
-                    for _ in piece.correct_captures(piece_arr, None):
-                        rook_mobility_advantage -= 1
+                    rook_mobility_advantage -= len(cm) + len(cc)
 
         c2_2 = 0.01
         bishop_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "bishop":
+                cm = piece.correct_moves(piece_arr, None)
+                cc = piece.correct_captures(piece_arr, None)
                 if piece.color == chessEngine.Color.WHITE:
-                    for _ in piece.correct_moves(piece_arr, None):
-                        bishop_mobility_advantage += 1
-                    for _ in piece.correct_captures(piece_arr, None):
-                        bishop_mobility_advantage += 1
+                    rook_mobility_advantage += len(cm) + len(cc)
                 else:
-                    for _ in piece.correct_moves(piece_arr, None):
-                        bishop_mobility_advantage -= 1
-                    for _ in piece.correct_captures(piece_arr, None):
-                        bishop_mobility_advantage -= 1
+                    rook_mobility_advantage -= len(cm) + len(cc)
 
         c2_3 = 0.01
         knight_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "knight":
+                cm = piece.correct_moves(piece_arr, None)
+                cc = piece.correct_captures(piece_arr, None)
                 if piece.color == chessEngine.Color.WHITE:
-                    for _ in piece.correct_moves(piece_arr, None):
-                        knight_mobility_advantage += 1
-                    for move in piece.correct_captures(piece_arr, None):
-                        knight_mobility_advantage += 1
+                    rook_mobility_advantage += len(cm) + len(cc)
                 else:
-                    for move in piece.correct_moves(piece_arr, None):
-                        knight_mobility_advantage -= 1
-                    for move in piece.correct_captures(piece_arr, None):
-                        knight_mobility_advantage -= 1
+                    rook_mobility_advantage -= len(cm) + len(cc)
 
         c2_4 = 0.005
         queen_mobility_advantage = 0
         for piece in self.board.pieces:
             if piece.name == "queen":
+                cm = piece.correct_moves(piece_arr, None)
+                cc = piece.correct_captures(piece_arr, None)
                 if piece.color == chessEngine.Color.WHITE:
-                    queen_mobility_advantage += len(piece.correct_moves(piece_arr, None))
-                    for move in piece.correct_captures(piece_arr, None):
-                        queen_mobility_advantage += 1
+                    rook_mobility_advantage += len(cm) + len(cc)
                 else:
-                    for move in piece.correct_moves(piece_arr, None):
-                        queen_mobility_advantage -= 1
-                    for move in piece.correct_captures(piece_arr, None):
-                        queen_mobility_advantage -= 1
+                    rook_mobility_advantage -= len(cm) + len(cc)
 
         evaluation += c1_1 * rook_advantage
         evaluation += c1_2 * bishop_advantage
@@ -468,7 +453,7 @@ class GameTree:
 
 def main():
     # board = chessEngine.Board.from_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e3 0 1")
-    board = chessEngine.Board.from_FEN("rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq e3 0 1")
+    board = chessEngine.Board.from_FEN("rnbqkbnr/pppp1ppp/8/4p3/8/8/PPPPPPPP/RNBQKBNR w")
     # board = chessEngine.Board.from_FEN("rnbqkbnr/8/8/8/8/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("rnbqkbnr/8/8/8/PPPPPPPP/8/8/K7 w KQkq e3 0 1")
     # board = Board.from_FEN("1nbqkbnr/8/8/8/1KPPPPPP/8/8/8 b KQkq e3 0 1")
