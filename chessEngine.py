@@ -141,7 +141,7 @@ class Piece:
                 if self.position.row != 0 and board_arr[self.position.row - 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row - 1, self.position.col))
-                if self.position.row == 6 and board_arr[self.position.row - 2][self.position.col] and board_arr[self.position.row - 1][self.position.col] == None:
+                if self.position.row == 6 and board_arr[self.position.row - 2][self.position.col] == None and board_arr[self.position.row - 1][self.position.col] == None:
                     moves.append(
                         Position(self.position.row - 2, self.position.col))
 
@@ -224,15 +224,6 @@ class Piece:
                             board_arr[self.position.row + i][self.position.col + j] == None):
                         moves.append(
                             Position(self.position.row + i, self.position.col + j))
-
-        if self.name == "king":
-            for i in range(-1, 2):
-                for j in range(-1, 2):
-                    if 0 <= self.position.row + i < 8 and 0 <= self.position.col + j < 8 and (
-                            board_arr[self.position.row + i][self.position.col + j] is not None and
-                            board_arr[self.position.row + i][self.position.col + j].color != self.color):
-                        moves.append(
-                            Position(self.position.row + i, self.position.col + j))
                         
             if self.color == Color.WHITE and self.first_move:
                 if board_arr[0][3] == None and board_arr[0][2] == None and board_arr[0][1] == None and board_arr[0][
@@ -248,7 +239,10 @@ class Piece:
                 if board_arr[7][5] == None and board_arr[7][6] == None and board_arr[7][7] != None and board_arr[7][
                     7].name == "rook" and board_arr[7][7].first_move:
                     moves.append(Position(7, 6))
-                    
+        
+        #for move in moves:
+            #if board_arr[move.row][move.col].color != None:
+                #moves.pop(move)
         return moves
 
     def correct_captures(self, board_arr, prev_board_arr):
