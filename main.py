@@ -733,7 +733,7 @@ class App(customtkinter.CTk):
         piece = self.board.get_piece_arr()[position.row][position.col]
         if self.board.move_piece(piece, chessEngine.Position(row, col)):
             game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
-            game_tree.alpha_beta_evaluation(3)
+            game_tree.alpha_beta_evaluation(4)
             move,_ = game_tree.suggest_move()
             self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
             self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
