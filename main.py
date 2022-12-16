@@ -651,6 +651,13 @@ class App(customtkinter.CTk):
     #                                                 #
     ###################################################
     def frame_profileButtonLogin_event(self):
+        self.button_playClient_event()
+        self.frame_profileButtonLogin.destroy
+        self.frame_profileButtonReg.destroy
+        self.frame_profileButtonLogout.grid(
+            row=1, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonPlay.grid(
+            row=2, column=0, sticky="nswe", padx=5, pady=5)
         App.withdraw(self)
         form_log = FormLogin()
         form_log.startLogForm()
@@ -659,10 +666,12 @@ class App(customtkinter.CTk):
         form_reg = FormRegister()
         form_reg.startRegForm()
     def frame_profileButtonLogout_event(self):
-        self.frame_profileButtonLogout.grid(
-            row=3, column=0, sticky="nswe", padx=5, pady=5)
-        self.frame_profileButtonPlay.grid(
-            row=4, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonLogout.destroy
+        self.frame_profileButtonPlay.destroy
+        self.frame_profileButtonLogin.grid(
+            row=1, column=0, sticky="nswe", padx=5, pady=5)
+        self.frame_profileButtonReg.grid(
+            row=2, column=0, sticky="nswe", padx=5, pady=5)
     def frame_profileButtonPlay_event(self):
         ...
 
