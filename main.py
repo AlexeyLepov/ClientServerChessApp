@@ -686,12 +686,13 @@ class App(customtkinter.CTk):
             try:
                 for i, j in itertools.product(range(8), range(8)):
                     self.ButtonField[i][j].configure(state="disabled")
-                
+
                 game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
                 game_tree.alpha_beta_evaluation(1)
                 move,_ = game_tree.suggest_move()
                 self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
                 self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
+                self.UpdateBoard()
 
                 for i, j in itertools.product(range(8), range(8)):
                     self.ButtonField[i][j].configure(state="normal")
@@ -706,8 +707,6 @@ class App(customtkinter.CTk):
                 B1 = tkinter.Button(popup, text="Okay", command = popup.destroy)
                 B1.pack()
                 popup.mainloop()
-            # very very slow !!!!
-            self.UpdateBoard()
         threading.Thread(target=_bot_turn).start()
         
 
@@ -755,18 +754,16 @@ class App(customtkinter.CTk):
             for capture in correct_captures:
                 self.ButtonField[capture.row][capture.col].configure(fg_color=(App.Colors.Field_Correct_Capture, App.Colors.Field_Correct_Capture))
         # if there is a selected one
-        else:                
+        else:
             self.ButtonField[position.row][position.col].configure(image = None)
             App.SelectedButtonField.selected = False
             App.SelectedButtonField.row = row
             App.SelectedButtonField.col = col
-            piece = self.board.get_piece_arr()[position.row][position.col]                
+            piece = self.board.get_piece_arr()[position.row][position.col]
             if self.board.move_piece(piece, chessEngine.Position(row, col)):
                 self.thread()
-            self.UpdateBoard()  
+            self.UpdateBoard()
             str = self.board.get_str_arr()
-
-
     #######################################################
     #                                                     #
     #    Function to paint the board in default colors    #
