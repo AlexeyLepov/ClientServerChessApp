@@ -7,13 +7,13 @@
 #################################################################################################################################################################################
 
 # importing external libraries
-import gc
 import os
 import sys
 import pymysql
 import tkinter
 import platform
 import itertools
+import threading
 import customtkinter
 import tkinter.messagebox
 from types import CellType
@@ -491,6 +491,7 @@ class App(customtkinter.CTk):
             self.UpdateBoard()
             for i, j in itertools.product(range(8), range(8)):
                 self.ButtonField[i][j].configure(command = lambda row=i,col=j: self.ButtonField_event(row,col))
+                # command = lambda row=i,col=j: self.thread(row,col,self.ButtonField,self)
             # for i, j in itertools.product(range(8), range(8)):
             #     self.ButtonField[i][j].bind("<Enter>", lambda event,row=i,col=j: self.onhover(event,row,col), add='+')
             #     self.ButtonField[i][j].bind("<Leave>", lambda event,row=i,col=j: self.onleave(event,row,col), add='+')
@@ -675,9 +676,39 @@ class App(customtkinter.CTk):
     def frame_profileButtonPlay_event(self):
         ...
 
+    ####################################
+    #                                  #
+    #    threaded bot turn function    #
+    #                                  #
+    ####################################
+    def thread(self):
+        def _bot_turn():
+            try:
+                for i, j in itertools.product(range(8), range(8)):
+                    self.ButtonField[i][j].configure(state="disabled")
 
+                game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
+                game_tree.alpha_beta_evaluation(1)
+                move,_ = game_tree.suggest_move()
+                self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
+                self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
+                self.UpdateBoard()
+
+                for i, j in itertools.product(range(8), range(8)):
+                    self.ButtonField[i][j].configure(state="normal")
+            except Exception as e:
+                print(e)
+                for i, j in itertools.product(range(8), range(8)):
+                    self.ButtonField[i][j].configure(state="normal")
+                popup = tkinter.Tk()
+                popup.wm_title("Ошибка!")
+                label = tkinter.Label(popup, text=f"У бота проблемы: \n{e}", font=("Verdana", 10))
+                label.pack(side="top", fill="x", pady=10)
+                B1 = tkinter.Button(popup, text="Okay", command = popup.destroy)
+                B1.pack()
+                popup.mainloop()
+        threading.Thread(target=_bot_turn).start()
         
-
 
 #################################################################################################################################################################################
 #################################################################################################################################################################################
@@ -724,21 +755,15 @@ class App(customtkinter.CTk):
                 self.ButtonField[capture.row][capture.col].configure(fg_color=(App.Colors.Field_Correct_Capture, App.Colors.Field_Correct_Capture))
         # if there is a selected one
         else:
-            self._extracted_from_ButtonField_event_21(position, row, col) 
-    def _extracted_from_ButtonField_event_21(self, position, row, col):
-        self.ButtonField[position.row][position.col].configure(image = None)
-        App.SelectedButtonField.selected = False
-        App.SelectedButtonField.row = row
-        App.SelectedButtonField.col = col
-        piece = self.board.get_piece_arr()[position.row][position.col]
-        if self.board.move_piece(piece, chessEngine.Position(row, col)):
-            game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
-            game_tree.alpha_beta_evaluation(4)
-            move,_ = game_tree.suggest_move()
-            self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
-            self.ButtonField[move[0][0]][move[0][1]].configure(image = None)
-        self.UpdateBoard()
-        str = self.board.get_str_arr()
+            self.ButtonField[position.row][position.col].configure(image = None)
+            App.SelectedButtonField.selected = False
+            App.SelectedButtonField.row = row
+            App.SelectedButtonField.col = col
+            piece = self.board.get_piece_arr()[position.row][position.col]
+            if self.board.move_piece(piece, chessEngine.Position(row, col)):
+                self.thread()
+            self.UpdateBoard()
+            str = self.board.get_str_arr()
     #######################################################
     #                                                     #
     #    Function to paint the board in default colors    #
