@@ -66,6 +66,8 @@ class Node:
         wp = 0
         #board_array = self.board.get_str_arr()
         piece_arr = self.board.pieces
+        bk = None
+        wk = None
         for piece in piece_arr:
             if piece:
                 if piece.name == "bishop" and piece.color == chessEngine.Color.BLACK:
@@ -108,18 +110,26 @@ class Node:
                     wr += 1
                     rook_advantage += 1
                     evaluation += bpt.ROOKS_TABLE[7-piece.position.row][piece.position.col]
-                elif piece.name == "king" and piece.color == chessEngine.Color.BLACK:
-                    king_advantage -= 1
-                    if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1):
-                        evaluation -= bpt.KINGS_ENDGAME_TABLE[piece.position.row][7-piece.position.col]
-                    else:
-                        evaluation -= bpt.KINGS_TABLE[piece.position.row][7-piece.position.col]
                 elif piece.name == "king" and piece.color == chessEngine.Color.WHITE:
-                    king_advantage += 1
-                    if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1):
-                        evaluation += bpt.KINGS_ENDGAME_TABLE[7-piece.position.row][7-piece.position.col]
-                    else:
-                        evaluation += bpt.KINGS_TABLE[7-piece.position.row][7-piece.position.col]
+                    wk = piece
+                elif piece.name == "king" and piece.color == chessEngine.Color.BLACK:
+                    bk = piece
+
+        if bk != None:
+            king_advantage -= 1
+            if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1) or (wb + wn <= 1 and bb + bn <= 1):
+                evaluation -= bpt.KINGS_ENDGAME_TABLE[bk.position.row][7-bk.position.col]
+                #print("endgame", wq, bq, bb, bn, wb, wn)
+            else:
+                evaluation -= bpt.KINGS_TABLE[bk.position.row][7-bk.position.col]
+        if wk != None:
+            king_advantage += 1
+            if bq+wq == 0 or (bq == 0 and wb + wn <= 1) or (wq == 0 and bb + bn <= 1) or (wb + wn <= 1 and bb + bn <= 1):
+                #print("endgame")
+                evaluation += bpt.KINGS_ENDGAME_TABLE[7-wk.position.row][7-wk.position.col]
+            else:
+                evaluation += bpt.KINGS_TABLE[7-wk.position.row][7-wk.position.col]
+        
         # c2_1 = 0.01
         # rook_mobility_advantage = 0
         # for piece in self.board.pieces:
