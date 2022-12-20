@@ -20,7 +20,7 @@ from types import CellType
 from PIL import Image
 
 # importing local files
-import config
+#import config
 import chessEngine
 import chessLogic
 
@@ -279,7 +279,7 @@ class App(customtkinter.CTk):
     PIECE_DIR = "Assets/PiecesModern/"      # Standard piece Image Folder
     PIECE_SIZE = 48
     # virtual board
-    board = None
+    board: chessEngine.Board = None
     # profile info
     global USERNAME
     global PASSWORD
@@ -761,9 +761,11 @@ class App(customtkinter.CTk):
             App.SelectedButtonField.col = col
             piece = self.board.get_piece_arr()[position.row][position.col]
             if self.board.move_piece(piece, chessEngine.Position(row, col)):
+                self.UpdateBoard()
                 self.thread()
-            self.UpdateBoard()
             str = self.board.get_str_arr()
+            for i in str:
+                print(*i)
     #######################################################
     #                                                     #
     #    Function to paint the board in default colors    #
@@ -775,21 +777,22 @@ class App(customtkinter.CTk):
                 self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_Black, App.Colors.Board_Black))
             else:
                 self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_White, App.Colors.Board_White))
-    def ClearBoard(self):
-        for i, j in itertools.product(range(8), range(8)):
-            self.ButtonField[i][j].configure(image = None)
+
     def UpdateBoard(self):
         self.RecolorBoard()
-        self.ButtonField[0][0].configure(image = None)
-        self.ButtonField[0][7].configure(image = None)
-        self.ButtonField[7][0].configure(image = None)
-        self.ButtonField[7][7].configure(image = None)
+        
         for i in range(8):
             for j in range(8):
-                self.ButtonField[i][j].configure(image = None)
-        for piece in self.board.pieces:
-            position = piece.position
-            self.ButtonField[position.row][position.col].configure(image = self.pieceImage(piece.name, piece.color))
+                piece = self.board.arr[i][j]
+                if piece == None:
+                    image = None
+                else:
+                    image = self.pieceImage(piece.name, piece.color)
+                if self.ButtonField[i][j].cget("image") != image:
+                    print(image)
+                    self.ButtonField[i][j].configure(image = None)
+                    self.ButtonField[i][j].configure(image = image)
+
     ###############################################################
     #                                                             #
     #    Function to return null if no shape has been selected    #
