@@ -20,7 +20,7 @@ from types import CellType
 from PIL import Image
 
 # importing local files
-#import config
+import config
 import chessEngine
 import chessLogic
 
@@ -734,28 +734,30 @@ class App(customtkinter.CTk):
         correct_captures - list of all possible captures of enemy pieces
         move_piece - piece moving
         '''
+        self.RecolorBoard()
         position = self.SelectedField()
         # print(self.board) # debbug
         # if no button is selected
+        
+        arr = self.board.get_piece_arr()
         if position is None: 
-            if self.board.get_piece_arr()[row][col] is None:
+            if arr[row][col] is None:
                 return
-            if self.board.get_piece_arr()[row][col].color != self.board.active_color:
+            if arr[row][col].color != self.board.active_color:
                 return
-            piece = self.board.get_piece_arr()[row][col]
+            piece = arr[row][col]
             self.ButtonField[row][col].configure(fg_color=(App.Colors.Moving_Piece, App.Colors.Moving_Piece))
             App.SelectedButtonField.selected = True
             App.SelectedButtonField.row = row
             App.SelectedButtonField.col = col
-            correct_moves = piece.correct_moves(self.board.arr, self.board.prev_arr)
-            correct_captures = piece.correct_captures(self.board.arr, self.board.prev_arr)
+            correct_moves = piece.correct_moves(arr)
+            correct_captures = piece.correct_captures(arr)
             for move in correct_moves:
                 self.ButtonField[move.row][move.col].configure(fg_color=(App.Colors.Field_Correct_Move, App.Colors.Field_Correct_Move))
             for capture in correct_captures:
                 self.ButtonField[capture.row][capture.col].configure(fg_color=(App.Colors.Field_Correct_Capture, App.Colors.Field_Correct_Capture))
         # if there is a selected one
         else:
-            self.ButtonField[position.row][position.col].configure(image = None)
             App.SelectedButtonField.selected = False
             App.SelectedButtonField.row = row
             App.SelectedButtonField.col = col
@@ -764,8 +766,6 @@ class App(customtkinter.CTk):
                 self.UpdateBoard()
                 self.thread()
             str = self.board.get_str_arr()
-            for i in str:
-                print(*i)
     #######################################################
     #                                                     #
     #    Function to paint the board in default colors    #
@@ -774,22 +774,23 @@ class App(customtkinter.CTk):
     def RecolorBoard(self):
         for i, j in itertools.product(range(8), range(8)):
             if ((i + j) % 2) == 0:
-                self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_Black, App.Colors.Board_Black))
+                if self.ButtonField[i][j].cget("fg_color") != (App.Colors.Board_Black, App.Colors.Board_Black):
+                    self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_Black, App.Colors.Board_Black))
             else:
-                self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_White, App.Colors.Board_White))
+                if self.ButtonField[i][j].cget("fg_color") != (App.Colors.Board_Black, App.Colors.Board_Black):
+                    self.ButtonField[i][j].configure(fg_color=(App.Colors.Board_White, App.Colors.Board_White))
 
     def UpdateBoard(self):
         self.RecolorBoard()
-        
+        arr = self.board.get_piece_arr()
         for i in range(8):
             for j in range(8):
-                piece = self.board.arr[i][j]
+                piece = arr[i][j]
                 if piece == None:
                     image = None
                 else:
                     image = self.pieceImage(piece.name, piece.color)
                 if self.ButtonField[i][j].cget("image") != image:
-                    print(image)
                     self.ButtonField[i][j].configure(image = None)
                     self.ButtonField[i][j].configure(image = image)
 

@@ -117,7 +117,7 @@ class Piece:
     def __repr__(self):
         return f"Piece({self.color}, {self.name}, {self.value})"
 
-    def correct_moves(self, board_arr, prev_board_arr):
+    def correct_moves(self, board_arr):
         """Returns a list of all possible moves for a piece
 
         Args:
@@ -245,7 +245,7 @@ class Piece:
                 #moves.pop(move)
         return moves
 
-    def correct_captures(self, board_arr, prev_board_arr):
+    def correct_captures(self, board_arr):
         captures = []
 
         if self.name == "pawn":  # pawn captures
@@ -407,8 +407,6 @@ class Board:
             self.pieces = Board.new_board()
         else:
             self.pieces = pieces
-        self.arr = self.get_piece_arr()
-        self.prev_arr = copy.deepcopy(self.arr)
         self.score = {Color.BLACK: 0, Color.WHITE: 0}
         self.active_color = active_color
 
@@ -472,30 +470,31 @@ class Board:
             brd.active_color = Color.WHITE
         return brd
 
-    def check_check(self, color):
-        """checks if a color is in check
+    # def check_check(self, color):
+    #     """checks if a color is in check
 
-        Args:
-            color (COLOR): color of the player to check
+    #     Args:
+    #         color (COLOR): color of the player to check
 
-        Returns:
-            bool: True if the player is in check, False otherwise
-        """
-        king_pos = None
-        for piece in self.pieces:
-            if piece.color == color and piece.name == "king":
-                king_pos = piece.position
-                break
-        if king_pos is not None:
-            for piece in self.pieces:
-                if piece.color != color:
-                    if king_pos in piece.correct_captures(self.arr,None):
-                        return True
-        return False
+    #     Returns:
+    #         bool: True if the player is in check, False otherwise
+    #     """
+    #     king_pos = None
+    #     for piece in self.pieces:
+    #         if piece.color == color and piece.name == "king":
+    #             king_pos = piece.position
+    #             break
+    #     if king_pos is not None:
+    #         for piece in self.pieces:
+    #             if piece.color != color:
+    #                 if king_pos in piece.correct_captures(self.arr,None):
+    #                     return True
+    #     return False
 
     def move_piece(self, piece, new_pos):
-        corr_moves = Piece.correct_moves(piece, self.arr, self.prev_arr)
-        corr_captures = Piece.correct_captures(piece, self.arr, self.prev_arr)
+        arr = self.get_piece_arr()
+        corr_moves = piece.correct_moves(arr)
+        corr_captures = piece.correct_captures(arr)
         #print(corr_moves)
         if piece.color != self.active_color:
             return False
@@ -506,38 +505,35 @@ class Board:
                     print(new_pos, Position(0, 6), new_pos == Position(0, 6), piece.first_move)
                     if new_pos == Position(0, 2) and piece.first_move:
                         print(2)
-                        rook = self.arr[0][0]
+                        rook = arr[0][0]
                         rook.position = Position(0, 3)
                         rook.first_move = False
                     if new_pos == Position(0, 6) and piece.first_move:
                         print(6)
-                        rook = self.arr[0][7]
+                        rook = arr[0][7]
                         rook.position = Position(0, 5)
                         rook.first_move = False
                 else:
                     if new_pos == Position(7, 2) and piece.first_move:
-                        rook = self.arr[7][0]
+                        rook = arr[7][0]
                         rook.position = Position(7, 3)
                         rook.first_move = False
                     if new_pos == Position(7, 6) and piece.first_move:
-                        rook = self.arr[7][7]
+                        rook = arr[7][7]
                         rook.position = Position(7, 5)
                         rook.first_move = False
             piece.position = new_pos
             piece.first_move = False
-            self.arr = self.get_piece_arr()
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
             return True
 
         elif new_pos in corr_captures:
-            eaten_piece = self.arr[new_pos.row][new_pos.col]
-            self.arr[new_pos.row][new_pos.col] = None
+            eaten_piece = arr[new_pos.row][new_pos.col]
             self.pieces.remove(eaten_piece)
             self.score[piece.color] += eaten_piece.value
             piece.first_move = False
             
             piece.position = new_pos
-            self.arr = self.get_piece_arr()
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
             return True
 
@@ -604,8 +600,8 @@ class Board:
         array = []
         piece_array = self.get_piece_arr()
         for piece in self.pieces:
-            moves = piece.correct_moves(piece_array,None)
-            captures = piece.correct_captures(piece_array,None)
+            moves = piece.correct_moves(piece_array)
+            captures = piece.correct_captures(piece_array)
             for move in captures:
                 if self.active_color == Color.WHITE and piece.color == Color.WHITE:
                     capture_arr.append([[piece.position.row,piece.position.col], [move.row,move.col]])
