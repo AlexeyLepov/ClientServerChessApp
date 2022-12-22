@@ -699,7 +699,7 @@ class App(customtkinter.CTk):
         App.USERNAME = App.PASSWORD = None
         self.updateProfileInfo()            
     def frame_profileButtonPlay_event(self):
-        import final_client_server.client
+        import FinalClientServer.client
 
 
     ####################################
