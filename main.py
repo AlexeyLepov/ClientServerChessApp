@@ -690,13 +690,7 @@ class App(customtkinter.CTk):
         App.withdraw(self)
         form_log = FormLogin()
         form_log.startLogForm()
-        if App.USERNAME!=None and App.PASSWORD!=None:
-            self.frame_profileButtonLogin.destroy
-            self.frame_profileButtonReg.destroy
-            self.frame_profileButtonLogout.grid(
-                row=1, column=0, sticky="nswe", padx=5, pady=5)
-            self.frame_profileButtonPlay.grid(
-                row=2, column=0, sticky="nswe", padx=5, pady=5)
+        self.updateProfileInfo() 
     def frame_profileButtonReg_event(self):
         App.withdraw(self)
         form_reg = FormRegister()
