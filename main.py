@@ -446,17 +446,21 @@ class App(customtkinter.CTk):
         self.frame_profile.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
         # Adding elements to the form
         self.frame_profileInfo = customtkinter.CTkLabel(master=self.frame_profile, height=100, fg_color=("#C0C2C5","#343638"))
-        self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
-        self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
-        self.frame_profileButtonLogout = customtkinter.CTkButton(master=self.frame_profile, text="Выйти", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogout_event)
-        self.frame_profileButtonPlay = customtkinter.CTkButton(master=self.frame_profile, text="Играть", fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonPlay_event)
+        self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", 
+            fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
+        self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", 
+            fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
+        self.frame_profileButtonLogout = customtkinter.CTkButton(master=self.frame_profile, text="Выйти", 
+            fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogout_event)
+        self.frame_profileButtonPlay = customtkinter.CTkButton(master=self.frame_profile, text="Играть", 
+            fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonPlay_event)
         # Packing elements
         self.frame_profileInfo.grid(
             row=0, column=0, sticky="nswe", padx=5, pady=5)
-        self.frame_profileButtonLogin.grid(
-            row=1, column=0, sticky="nswe", padx=5, pady=5)
-        self.frame_profileButtonReg.grid(
-            row=2, column=0, sticky="nswe", padx=5, pady=5)
+        # self.frame_profileButtonLogin.grid(
+        #     row=1, column=0, sticky="nswe", padx=5, pady=5)
+        # self.frame_profileButtonReg.grid(
+        #     row=2, column=0, sticky="nswe", padx=5, pady=5)
         
 
 #################################################################################################################################################################################
@@ -537,19 +541,49 @@ class App(customtkinter.CTk):
                 if cur.rowcount == 1:
                     self.frame_profileInfo.configure(text=f"Добро пожаловать, {App.USERNAME}!")
                     print(f"Добро пожаловать, {App.USERNAME}!")
-                    self.frame_profileButtonLogin.configure(text="Выйти", command=self.frame_profileButtonLogout)
+                    # self.frame_profileButtonLogin.configure(text="Выйти", command=self.frame_profileButtonLogout)
+                    # self.frame_profileButtonLogin.grid(
+                    #     row=1, column=0, sticky="nswe", padx=5, pady=5)
+                    # self.frame_profileButtonReg.grid(
+                    #     row=2, column=0, sticky="nswe", padx=5, pady=5)
+                    self.frame_profileButtonLogin.destroy
+                    self.frame_profileButtonReg.destroy
+                    self.frame_profileButtonLogout = customtkinter.CTkButton(master=self.frame_profile, text="Выйти", 
+                        fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogout_event)
+                    self.frame_profileButtonPlay = customtkinter.CTkButton(master=self.frame_profile, text="Играть", 
+                        fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonPlay_event)
+                    self.frame_profileButtonLogout.grid(
+                        row=1, column=0, sticky="nswe", padx=5, pady=5)
+                    self.frame_profileButtonPlay.grid(
+                        row=2, column=0, sticky="nswe", padx=5, pady=5)
+                else:                
+                    print("Добро пожаловать, гость! - else")
+                    self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", 
+                        fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
+                    self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", 
+                        fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
+                    self.frame_profileInfo.configure(text="Добро пожаловать, гость!")
                     self.frame_profileButtonLogin.grid(
                         row=1, column=0, sticky="nswe", padx=5, pady=5)
                     self.frame_profileButtonReg.grid(
                         row=2, column=0, sticky="nswe", padx=5, pady=5)
-                else:                
-                    print("Добро пожаловать, гость!")
-                    self.frame_profileInfo.configure(text="Добро пожаловать, гость!")
+                    self.frame_profileButtonLogout.destroy
+                    self.frame_profileButtonPlay.destroy
             finally:
                 conn.close()
         except Exception:
-            print("Добро пожаловать, гость!")
+            print("Добро пожаловать, гость! - Exception")
             self.frame_profileInfo.configure(text="Добро пожаловать, гость!")
+            self.frame_profileButtonLogin = customtkinter.CTkButton(master=self.frame_profile, text="Войти", 
+                fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonLogin_event)
+            self.frame_profileButtonReg = customtkinter.CTkButton(master=self.frame_profile, text="Зарегистрироваться", 
+                fg_color=(App.Colors.Menu_Button, App.Colors.Menu_Button), width=180, height=60, command=self.frame_profileButtonReg_event)
+            self.frame_profileButtonLogin.grid(
+                row=1, column=0, sticky="nswe", padx=5, pady=5)
+            self.frame_profileButtonReg.grid(
+                row=2, column=0, sticky="nswe", padx=5, pady=5)
+            self.frame_profileButtonLogout.destroy
+            self.frame_profileButtonPlay.destroy
     #####################################
     #                                   #
     #    Piece image return function    #
@@ -653,28 +687,20 @@ class App(customtkinter.CTk):
     ###################################################
     def frame_profileButtonLogin_event(self):
         self.button_playClient_event()
-        self.frame_profileButtonLogin.destroy
-        self.frame_profileButtonReg.destroy
-        self.frame_profileButtonLogout.grid(
-            row=1, column=0, sticky="nswe", padx=5, pady=5)
-        self.frame_profileButtonPlay.grid(
-            row=2, column=0, sticky="nswe", padx=5, pady=5)
         App.withdraw(self)
         form_log = FormLogin()
         form_log.startLogForm()
+        self.updateProfileInfo() 
     def frame_profileButtonReg_event(self):
         App.withdraw(self)
         form_reg = FormRegister()
         form_reg.startRegForm()
     def frame_profileButtonLogout_event(self):
-        self.frame_profileButtonLogout.destroy
-        self.frame_profileButtonPlay.destroy
-        self.frame_profileButtonLogin.grid(
-            row=1, column=0, sticky="nswe", padx=5, pady=5)
-        self.frame_profileButtonReg.grid(
-            row=2, column=0, sticky="nswe", padx=5, pady=5)
+        App.USERNAME = App.PASSWORD = None
+        self.updateProfileInfo()            
     def frame_profileButtonPlay_event(self):
-        ...
+        import FinalClientServer.client
+
 
     ####################################
     #                                  #
@@ -688,7 +714,7 @@ class App(customtkinter.CTk):
                     self.ButtonField[i][j].configure(state="disabled")
 
                 game_tree = chessLogic.GameTree(self.board.get_FEN(),False)
-                game_tree.alpha_beta_evaluation(1)
+                game_tree.alpha_beta_evaluation(3)
                 move,_ = game_tree.suggest_move()
                 self.board.move_piece(self.board.get_piece_arr()[move[0][0]][move[0][1]],chessEngine.Position(move[1][0],move[1][1]))
                 self.ButtonField[move[0][0]][move[0][1]].configure(image = None)

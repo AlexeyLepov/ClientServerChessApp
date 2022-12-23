@@ -4,6 +4,8 @@
 .Nolongerinuse/*
 __pycache__/*
 Testing/__pycache__/*
+SocketClientServer/__pycache__/*
+final_client_server/__pycache__/*
 
 config.py
 bestMoveLogger.txt

@@ -479,50 +479,47 @@ class GameTree:
         # global t_table
         # t_table.clear()
         self.evaluation = 10 ** 9
-        move = None
-        child = None
+        ret_move = None
+        ret_child = None
         for i in range(len(self.root.children)):
 
             if self.root.children[i].evaluation < self.evaluation:
                 self.evaluation = self.root.children[i].evaluation
-                move = self.root.moves[i]
-                child = self.root.children[i]
+                ret_move = self.root.moves[i]
+                ret_child = self.root.children[i]
 
-        # fout = open("bestMoveLogger.txt","w")
-        # arr = self.root.board.get_str_arr()
+        fout = open("bestMoveLogger.txt","w")
 
-        # for n, i in enumerate(arr):
-        #     fout.write(str(8 - n) + " ")
-        #     for j in i:
-        #         fout.write(str(j) + " ")
-        #     fout.write("\n")
-        # print("\n" + "  a  b  c  d  e  f  g  h" + "\n" + "\n")
 
-        # go = True
-        # node = child
-        # while go:
-        #     go = False
-        #     arr = chessEngine.Board.from_FEN(node.fen).get_str_arr()
-        #     for n, i in enumerate(arr):
-        #         fout.write(str(8 - n) + " ")
-        #         for j in i:
-        #             fout.write(str(j) + " ")
-        #         fout.write("\n")
-        #     fout.write("  a  b  c  d  e  f  g  h" + "\n" + "\n")
-        #     for ch in node.children:
-        #         print(node.evaluation, " ", ch.evaluation)
-        #         if round(ch.evaluation,5) == round(-node.evaluation,5):
-        #             go = True
-        #             node = ch
-        #             break
+        go = True
+        log_node = Node(self.root.fen,self.is_white)
+        log_node.board = chessEngine.Board.from_FEN(self.root.fen)
+        node = self.root
+        while go:
+            go = False
+            arr = log_node.board.get_str_arr()
+            for n, i in enumerate(arr):
+                fout.write(str(8 - n) + "|")
+                for j in i:
+                    fout.write(str(j) + "|")
+                fout.write("\n")
+            fout.write("  a  b  c  d  e  f  g  h" + "\n" + "\n")
+
+            for i in range(len(node.children)):
+                if round(node.children[i].evaluation,5) == round(-node.evaluation,5):
+                    go = True
+                    log_node.move_straight(log_node.board,node.moves[i])
+                    node = node.children[i]
+
+                    break
 
 
 
-        #fout.close()
+        fout.close()
 
 
 
-        return move, child
+        return ret_move, ret_child
 
 
 def main():
