@@ -470,28 +470,7 @@ class Board:
             brd.active_color = Color.WHITE
         return brd
 
-    # def check_check(self, color):
-    #     """checks if a color is in check
-
-    #     Args:
-    #         color (COLOR): color of the player to check
-
-    #     Returns:
-    #         bool: True if the player is in check, False otherwise
-    #     """
-    #     king_pos = None
-    #     for piece in self.pieces:
-    #         if piece.color == color and piece.name == "king":
-    #             king_pos = piece.position
-    #             break
-    #     if king_pos is not None:
-    #         for piece in self.pieces:
-    #             if piece.color != color:
-    #                 if king_pos in piece.correct_captures(self.arr,None):
-    #                     return True
-    #     return False
-
-    def move_piece(self, piece, new_pos):
+    def move_piece(self, piece: Piece, new_pos: Position):
         arr = self.get_piece_arr()
         corr_moves = piece.correct_moves(arr)
         corr_captures = piece.correct_captures(arr)
@@ -522,6 +501,14 @@ class Board:
                         rook = arr[7][7]
                         rook.position = Position(7, 5)
                         rook.first_move = False
+            elif piece.name == "pawn":
+                if piece.color == Color.WHITE and new_pos.row == 7:
+                    piece.name = "queen"
+                    piece.value = 9
+                if piece.color == Color.BLACK and new_pos.row == 0:
+                    piece.name = "queen"
+                    piece.value = 9
+                    
             piece.position = new_pos
             piece.first_move = False
             self.active_color = Color.BLACK if self.active_color == Color.WHITE else Color.WHITE
